@@ -122,6 +122,93 @@ html, body {
 .name-prompt input:focus,
 .line-input:focus { border-color: var(--green-bright); }
 
+/* ---------- Daily focus + streak ---------- */
+.focus { margin-top: clamp(2rem, 6vh, 3.5rem); min-height: 7.5rem; }
+
+.focus-form { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.focus-form label { font-size: clamp(1.1rem, 2.2vw, 1.6rem); font-weight: 500; }
+
+.focus-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--silver-dim);
+}
+
+.streak {
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-weight: 600;
+  color: var(--silver);
+  background: rgba(47, 93, 80, 0.75);
+  border: 1px solid rgba(90, 154, 130, 0.6);
+  padding: 2px 10px;
+  border-radius: 999px;
+  text-shadow: none;
+}
+
+.focus-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-size: clamp(1.3rem, 2.8vw, 2rem);
+  font-weight: 500;
+}
+
+.focus-text { transition: color 0.3s, text-decoration-color 0.3s; text-decoration: line-through transparent 2px; }
+.focus-view.is-done .focus-text { color: var(--silver-dim); text-decoration-color: var(--green-bright); }
+
+/* custom round checkbox */
+.focus-check {
+  appearance: none;
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  margin: 0;
+  border: 2px solid var(--silver);
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+.focus-check::after {
+  content: "";
+  width: 0.32em;
+  height: 0.55em;
+  border: solid var(--silver);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg) translate(-1px, -1px) scale(0);
+  transition: transform 0.2s;
+}
+.focus-check:checked { background: var(--green); border-color: var(--green-bright); }
+.focus-check:checked::after { transform: rotate(45deg) translate(-1px, -1px) scale(1); }
+.focus-check:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 3px; }
+
+.icon-button {
+  background: none;
+  border: none;
+  color: var(--silver-dim);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+}
+.focus-row:hover .icon-button,
+.icon-button:focus-visible { opacity: 1; }
+.icon-button:hover { color: var(--silver); }
+
+.focus-praise { margin: 10px 0 0; min-height: 1.2em; font-size: 1rem; color: var(--silver-dim); }
+
 /* ---------- Photo credit (required by Unsplash) ---------- */
 .photo-credit {
   margin: 0;

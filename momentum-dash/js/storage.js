@@ -35,6 +35,12 @@ export function onChange(key, callback) {
 }
 
 // "YYYY-MM-DD" in the user's local time zone (used for daily resets and streaks).
+// dayOffset(-1) = yesterday. Built from calendar fields, so daylight-saving days are safe.
+export function dayOffset(offset) {
+  const now = new Date();
+  return todayKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset));
+}
+
 export function todayKey(date = new Date()) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");

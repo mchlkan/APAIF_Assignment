@@ -30,6 +30,27 @@
         <p class="greeting">
           <span id="greeting-text"></span><span id="greeting-name" class="greeting-name" title="Double-click to change your name"></span>.
         </p>
+
+        <!-- Daily focus + streak -->
+        <section id="focus" class="focus" aria-label="Main focus for today">
+          <form id="focus-form" class="focus-form" hidden>
+            <label for="focus-input">What is your main focus for today?</label>
+            <input id="focus-input" class="line-input" type="text" autocomplete="off" maxlength="80">
+          </form>
+
+          <div id="focus-view" class="focus-view" hidden>
+            <p class="focus-heading">
+              <span>Today</span>
+              <span id="streak" class="streak" hidden></span>
+            </p>
+            <div class="focus-row">
+              <input id="focus-done" type="checkbox" class="focus-check" aria-label="Mark focus as done">
+              <span id="focus-text" class="focus-text"></span>
+              <button id="focus-remove" class="icon-button" type="button" aria-label="Clear focus" title="Clear focus">×</button>
+            </div>
+            <p id="focus-praise" class="focus-praise" aria-live="polite"></p>
+          </div>
+        </section>
       </div>
     </section>
 
