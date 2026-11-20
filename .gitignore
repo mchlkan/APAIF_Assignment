@@ -221,3 +221,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Local working docs (assistant + me), not part of the submission ---
+_work/
+CLAUDE.local.md
+.claude/settings.local.json
+.DS_Store
+# Course brief (not ours to publish)
+individual-submission.pdf
