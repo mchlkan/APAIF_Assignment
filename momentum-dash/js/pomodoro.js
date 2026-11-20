@@ -9,6 +9,7 @@
 //   pomodoroLog = { date: "YYYY-MM-DD", count }   → completed focus rounds today
 import * as storage from "./storage.js";
 import { getSettings } from "./settings.js";
+import { openGame } from "./game.js";
 
 const MINUTE = 60_000;
 // Phase lengths in ms; defaults 25/5/15 min, adjustable in the settings panel.
@@ -30,6 +31,7 @@ const els = {
   toggle: document.getElementById("pomo-toggle"),
   reset: document.getElementById("pomo-reset"),
   skip: document.getElementById("pomo-skip"),
+  play: document.getElementById("pomo-play"),
 };
 
 const CIRCUMFERENCE = 2 * Math.PI * Number(els.ring.getAttribute("r"));
@@ -126,6 +128,7 @@ function render() {
   els.toggle.textContent = state.status === "running" ? "Pause" : state.status === "paused" ? "Resume" : "Start";
   els.root.dataset.mode = state.mode;
   els.root.dataset.status = state.status;
+  els.play.hidden = state.mode === "focus"; // break time → offer the mini game
 
   // Show the countdown in the tab title while running (visible even from other tabs).
   document.title = state.status === "running" ? `${format(remaining)} · ${LABELS[state.mode]}` : defaultTitle;
@@ -145,6 +148,7 @@ function bindEvents() {
   });
   els.reset.addEventListener("click", () => save(fresh(state.mode, state.round)));
   els.skip.addEventListener("click", () => save(nextPhase(state)));
+  els.play.addEventListener("click", openGame);
 
   storage.onChange("pomodoro", (next) => { state = next ?? fresh("focus"); render(); });
   document.addEventListener("visibilitychange", loop); // finish a phase that ended while hidden

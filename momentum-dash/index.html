@@ -12,8 +12,7 @@
   <div class="vignette" aria-hidden="true"></div>
 
   <main class="layout">
-    <!-- top-left / top-right slots: filled in later milestones (links, weather) -->
-    <header class="top-row">
+        <header class="top-row">
       <div id="top-left">
         <!-- Pomodoro timer -->
         <section id="pomodoro" class="pomodoro panel" aria-label="Pomodoro timer">
@@ -32,12 +31,14 @@
               <button id="pomo-reset" class="small-button" type="button" title="Restart this phase" aria-label="Restart this phase">↺</button>
               <button id="pomo-skip" class="small-button" type="button" title="Skip to next phase" aria-label="Skip to next phase">⏭︎</button>
             </div>
+            <!-- shown during breaks: opens the mini game -->
+            <button id="pomo-play" class="text-button pomo-play" type="button" data-opens-game hidden>Break time: play a round ›</button>
           </div>
         </section>
       </div>
       <div id="top-right">
         <!-- Weather (Open-Meteo) -->
-        <section id="weather" class="weather" aria-label="Current weather" hidden>
+        <section id="weather" class="weather panel" aria-label="Current weather" hidden>
           <p class="weather-main">
             <span id="weather-icon" class="weather-icon" aria-hidden="true"></span>
             <span id="weather-temp" class="weather-temp"></span>
@@ -46,6 +47,20 @@
             <span id="weather-city" class="weather-city" title="Click to change city"></span>
             <span id="weather-desc" class="weather-desc"></span>
           </p>
+        </section>
+
+        <!-- To-do list: stays open; collapse with − or the Todo button -->
+        <section id="todo-panel" class="panel todo-panel" aria-label="To-do list" hidden>
+          <div class="panel-header">
+            <h2 class="popover-title">To-dos</h2>
+            <button id="todo-collapse" class="icon-button always" type="button" aria-label="Hide to-do list" title="Hide">−</button>
+          </div>
+          <ul id="todo-list" class="todo-list"></ul>
+          <p id="todo-empty" class="todo-empty">Nothing here yet. Add your first to-do below.</p>
+          <form id="todo-form">
+            <input id="todo-input" class="todo-input" type="text" placeholder="New to-do" autocomplete="off" maxlength="120">
+          </form>
+          <button id="todo-clear" class="text-button" type="button" hidden>Clear completed</button>
         </section>
       </div>
     </header>
@@ -68,7 +83,7 @@
         <section id="focus" class="focus" aria-label="Main focus for today">
           <form id="focus-form" class="focus-form" hidden>
             <label for="focus-input">What is your main focus for today?</label>
-            <input id="focus-input" class="line-input" type="text" autocomplete="off" maxlength="80">
+            <input id="focus-input" class="focus-input" type="text" autocomplete="off" maxlength="80" placeholder="Type it and press Enter">
           </form>
 
           <div id="focus-view" class="focus-view" hidden>
@@ -105,19 +120,29 @@
           <span class="gear" aria-hidden="true">⚙︎</span>
         </button>
 
+        <!-- Mini game -->
+        <button id="game-toggle" class="corner-button" type="button" aria-expanded="false" aria-controls="game-panel" title="Play tic-tac-toe against a bot">Play</button>
+
         <!-- To-dos -->
         <button id="todo-toggle" class="corner-button todo-toggle" type="button" aria-expanded="false" aria-controls="todo-panel">
           Todo <span id="todo-count" class="todo-count" hidden></span>
         </button>
 
-        <section id="todo-panel" class="popover panel todo-panel" aria-label="To-do list" hidden>
-          <h2 class="popover-title">Today's to-dos</h2>
-          <ul id="todo-list" class="todo-list"></ul>
-          <p id="todo-empty" class="todo-empty">Nothing here yet. Add your first to-do below.</p>
-          <form id="todo-form">
-            <input id="todo-input" class="todo-input" type="text" placeholder="New to-do" autocomplete="off" maxlength="120">
-          </form>
-          <button id="todo-clear" class="text-button" type="button" hidden>Clear completed</button>
+
+        <section id="game-panel" class="popover panel game-panel" aria-label="Tic-tac-toe" hidden>
+          <div class="panel-header">
+            <h2 class="popover-title">Tic-tac-toe</h2>
+            <div class="segmented" role="group" aria-label="Difficulty">
+              <button type="button" data-level="easy">Easy</button>
+              <button type="button" data-level="hard">Hard</button>
+            </div>
+          </div>
+          <div id="game-board" class="game-board" role="grid" aria-label="Board"></div>
+          <p id="game-status" class="game-status" aria-live="polite"></p>
+          <div class="game-footer">
+            <span id="game-score" class="game-score"></span>
+            <button id="game-new" class="pill-button" type="button">New game</button>
+          </div>
         </section>
 
         <section id="settings-panel" class="popover panel settings-panel" aria-label="Settings" hidden>
@@ -141,6 +166,10 @@
               <label class="row">Focus <input name="duration-focus" type="number" min="1" max="180"></label>
               <label class="row">Short break <input name="duration-short" type="number" min="1" max="180"></label>
               <label class="row">Long break <input name="duration-long" type="number" min="1" max="180"></label>
+            </fieldset>
+            <fieldset>
+              <legend>Layout</legend>
+              <div class="row">Move widgets around <button id="settings-edit-layout" class="pill-button" type="button">Edit layout</button></div>
             </fieldset>
           </form>
           <button id="settings-reset" class="text-button danger" type="button">Reset all data</button>

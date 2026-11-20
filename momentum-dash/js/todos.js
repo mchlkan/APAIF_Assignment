@@ -1,5 +1,5 @@
-// Small to-do list in a pop-up panel (bottom right).
-// Stored data: todos = [{ id, text, done }]
+// To-do list in a panel under the weather. It stays open until hidden (− or the Todo button).
+// Stored data: todos = [{ id, text, done }], todoOpen = true|false
 import * as storage from "./storage.js";
 
 const els = {
@@ -11,6 +11,7 @@ const els = {
   form: document.getElementById("todo-form"),
   input: document.getElementById("todo-input"),
   clear: document.getElementById("todo-clear"),
+  collapse: document.getElementById("todo-collapse"),
 };
 
 let todos = [];
@@ -58,17 +59,21 @@ function render() {
   els.clear.hidden = !todos.some((t) => t.done);
 }
 
-function setOpen(open) {
+// The panel stays open (also across new tabs) until the user hides it.
+function setOpen(open, { save: persist = true, focus = false } = {}) {
   els.panel.hidden = !open;
   els.toggle.setAttribute("aria-expanded", String(open));
-  if (open) els.input.focus();
+  if (persist) storage.set("todoOpen", open);
+  if (open && focus) els.input.focus();
 }
 
 export async function initTodos() {
   todos = await storage.get("todos", []);
   render();
+  setOpen(await storage.get("todoOpen", true), { save: false });
 
-  els.toggle.addEventListener("click", () => setOpen(els.panel.hidden));
+  els.toggle.addEventListener("click", () => setOpen(els.panel.hidden, { focus: true }));
+  els.collapse.addEventListener("click", () => setOpen(false));
   els.form.addEventListener("submit", (event) => {
     event.preventDefault();
     const text = els.input.value.trim();
@@ -78,11 +83,6 @@ export async function initTodos() {
   });
   els.clear.addEventListener("click", () => save(todos.filter((t) => !t.done)));
 
-  // Close on Escape or a click outside the panel.
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
-  document.addEventListener("click", (e) => {
-    if (!els.panel.hidden && !els.panel.contains(e.target) && !els.toggle.contains(e.target)) setOpen(false);
-  });
-
   storage.onChange("todos", (next) => { todos = next ?? []; render(); });
+  storage.onChange("todoOpen", (open) => setOpen(open ?? true, { save: false }));
 }
