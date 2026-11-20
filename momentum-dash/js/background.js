@@ -88,7 +88,7 @@ function show(photo) {
     els.background.style.opacity = "1";
   });
   els.credit.replaceChildren(
-    "Photo by ", link(photo.profileUrl, photo.photographer),
+    link(photo.photoUrl, "Photo"), " by ", link(photo.profileUrl, photo.photographer),
     " on ", link(withUtm("https://unsplash.com/"), "Unsplash"),
   );
   els.credit.hidden = false;

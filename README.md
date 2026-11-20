@@ -19,4 +19,4 @@ conda activate apaif
 pip install -r <project>/requirements.txt
 ```
 
-Any Python 3.12 virtual environment works as well. The Momentum Dash extension needs no Python.
+Any Python 3.12 virtual environment works as well. The Momentum Dash extension itself needs no Python; only its optional developer scripts in `momentum-dash/tools/` use Python 3.9+ (standard library only).

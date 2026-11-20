@@ -1,0 +1,3 @@
+# Real Unsplash key (copy config.example.js to config.js). Kept here too, so the rule
+# still works if this folder is moved or renamed.
+config.js

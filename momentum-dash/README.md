@@ -85,7 +85,7 @@ Why `chrome.storage.local` and not a database: the data is small, personal and o
 
    ![Edit-layout mode: empty slots, dashed outlines and resize handles](docs/screenshot-edit-mode.jpg)
 9. **⚙︎ Settings** (bottom right): every change is saved immediately. **Escape** or a click outside closes the pop-up panels.
-10. Hover the quote to see the author; click the photo credit to open the photo on Unsplash.
+10. Hover the quote to see the author; in the photo credit, click "Photo" to open the photo on Unsplash or the name to open the photographer's profile.
 
 ## Setup
 
@@ -113,7 +113,7 @@ Why `chrome.storage.local` and not a database: the data is small, personal and o
 |---|---|
 | `python3 tools/fetch_fallback_photos.py` | Re-download the bundled fallback photos (needs `config.js` or an `UNSPLASH_ACCESS_KEY` environment variable) |
 | `python3 tools/make_icons.py` | Regenerate the extension icons |
-| `python3 -m http.server 5173` | Preview the page in a normal browser tab at `http://localhost:5173`; the code falls back to `localStorage` when `chrome.storage` is not available |
+| `python3 -m http.server 5173 --bind 127.0.0.1` | Preview the page in a normal browser tab at `http://localhost:5173` (`--bind 127.0.0.1` keeps it off your local network, since the folder contains your `config.js`); the code falls back to `localStorage` when `chrome.storage` is not available |
 
 **Project structure**
 
@@ -168,7 +168,7 @@ momentum-dash/
 
 **Assistance and external sources**
 
-- **AI:** I built this project with **Claude Code (Anthropic)** as a coding assistant. It explained the extension concepts, helped plan the milestones, wrote most of the code following my feature and design decisions, and tested each milestone in a preview browser. I reviewed and tried every milestone, asked for changes, and made all the Git commits myself.
+- **AI:** I built this project with **Claude Code (Anthropic)** as a coding assistant. It explained the extension concepts, helped plan the milestones, wrote most of the code following my feature and design decisions, and tested each milestone in a preview browser. I reviewed and tried every milestone and asked for changes. I made the commits myself during development. For the final rounds (layout fixes and the audit) I let Claude Code commit and push on my behalf after reviewing the changes; those commits credit it with a `Co-Authored-By` line.
 - **Documentation:**
   - [Chrome Extensions (Manifest V3)](https://developer.chrome.com/docs/extensions)
   - [Unsplash API documentation](https://unsplash.com/documentation) and [API guidelines](https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines)
