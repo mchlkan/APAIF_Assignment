@@ -52,8 +52,7 @@ async function pickFallbackPhoto() {
   const photos = await response.json();
   if (!photos.length) return null;
   // Same photo all day, different photo each day.
-  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86_400_000);
-  const photo = photos[dayOfYear % photos.length];
+  const photo = photos[storage.dayOfYear() % photos.length];
   return {
     url: `assets/fallback/${photo.file}`,
     photographer: photo.photographer,

@@ -34,7 +34,19 @@
           </div>
         </section>
       </div>
-      <div id="top-right"></div>
+      <div id="top-right">
+        <!-- Weather (Open-Meteo) -->
+        <section id="weather" class="weather" aria-label="Current weather" hidden>
+          <p class="weather-main">
+            <span id="weather-icon" class="weather-icon" aria-hidden="true"></span>
+            <span id="weather-temp" class="weather-temp"></span>
+          </p>
+          <p class="weather-sub">
+            <span id="weather-city" class="weather-city" title="Click to change city"></span>
+            <span id="weather-desc" class="weather-desc"></span>
+          </p>
+        </section>
+      </div>
     </header>
 
     <section class="center">
@@ -79,7 +91,13 @@
       <div id="bottom-left">
         <p id="photo-credit" class="photo-credit" hidden></p>
       </div>
-      <div id="bottom-center"></div>
+      <div id="bottom-center">
+        <!-- Quote of the day (author appears on hover) -->
+        <figure id="quote" class="quote" hidden>
+          <blockquote id="quote-text" class="quote-text"></blockquote>
+          <figcaption id="quote-author" class="quote-author"></figcaption>
+        </figure>
+      </div>
       <div id="bottom-right"></div>
     </footer>
   </main>

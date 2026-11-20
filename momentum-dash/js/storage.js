@@ -46,6 +46,11 @@ export function dayOffset(offset) {
   return todayKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset));
 }
 
+// 1–366; used to rotate daily content (fallback photo, quote).
+export function dayOfYear(date = new Date()) {
+  return Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86_400_000);
+}
+
 export function todayKey(date = new Date()) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
