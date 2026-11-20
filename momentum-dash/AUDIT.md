@@ -84,7 +84,7 @@ Final check on the default branch, the way the repository will be published.
 | 3-8 | Screenshots were taken before the Open-Meteo credit line was added | Confirmed (minor) | **Won't fix** | Only the credit line is missing; everything else is current |
 | 3-9 | First name in the README and screenshots | Possible | **Won't fix** | As in run 1 (2.6): already public on the repository |
 | 3-10 | Merged branch `momentum-dash` still exists on GitHub | Possible | **Won't fix** | Its commits are part of `main` anyway; the branch shows the workflow |
-| 3-11 | Enable GitHub secret scanning / push protection | Recommendation | **Michael** | A GitHub setting, outside the code |
+| 3-11 | Enable GitHub secret scanning / push protection | Recommendation | **Done** | Push protection is enabled in the repository settings |
 
 Fixes in the commit that adds this version of `AUDIT.md`.
 
@@ -103,6 +103,6 @@ Fixes in the commit that adds this version of `AUDIT.md`.
   - The initial commit (`09037b0`) contains my student number, in the old `LICENSE` and in the commit's author name.
   - The commits before `2b5656b` contain my personal email address.
   - The current files are clean, and new commits use the GitHub noreply address.
-  - Removing these values from the history would need a rewrite (`git filter-repo`) and a force-push. For now this is left as is and documented here.
+  - Removing these values from the history would need a rewrite (`git filter-repo`) and a force-push. I decided to **keep the history as it is**. It is part of the learning process this audit documents, and rewriting a published history is riskier than the data is sensitive.
 - **The audit can't prove the project is safe.** The secret search is pattern-based, and the auditor ran no code. Runtime behaviour was tested separately and manually (see README, *Limitations*).
 - **GitHub settings were not checked by the auditor,** such as repository visibility and secret scanning. I check that the repository opens when logged out before submitting.
