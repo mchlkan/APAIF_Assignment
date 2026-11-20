@@ -1,6 +1,6 @@
 # Verdant Tab — a Momentum Dash replica
 
-A Chrome extension that replaces the new-tab page with a calm personal dashboard: a daily nature photo, a clock with a personal greeting, your **main focus for the day**, a **Pomodoro timer**, a **focus streak**, the weather, a quote and a small to-do list. Minimal design in dark, silver and dark green.
+A Chrome extension that replaces the new-tab page with a calm personal dashboard: a daily nature photo, a clock with a personal greeting, your **main focus for the day**, a **Pomodoro timer**, a **focus streak**, the weather, a quote, a to-do list and a quick **tic-tac-toe game** for your breaks. You can **drag every widget** to where you want it. Minimal design in dark, silver and dark green.
 
 ![Verdant Tab screenshot](docs/screenshot.png)
 
@@ -23,7 +23,9 @@ The extra idea in my version is a small **focus loop**:
 | Pomodoro timer | Ring timer, the same in every open tab, countdown in the tab title, chime at the end |
 | Weather | Current temperature and conditions for your city (click the city to change it) |
 | Quote | A short quote of the day; the author appears on hover |
-| To-dos | Pop-up list: add, tick, delete, clear completed |
+| To-dos | Panel that stays open under the weather: add, tick, delete, clear completed; hide it with − |
+| Tic-tac-toe | A quick game against a bot (Easy, or Hard = unbeatable), offered during Pomodoro breaks; score is kept |
+| Edit layout | Drag the widgets anywhere, like rearranging apps on a phone home screen; positions are saved |
 | Settings | Name, city, 12/24-hour clock, show or hide widgets, Pomodoro lengths, reset all data |
 
 ## Data collection
@@ -51,6 +53,9 @@ Everything is stored **locally in the browser** with `chrome.storage.local`. The
 | `pomodoro` | `{ mode, status, endsAt, remaining, round }` | The timer stores **when it ends**, not a countdown, so every tab shows the same time and closing a tab loses nothing |
 | `pomodoroLog` | `{ date, count }` | Focus rounds completed today |
 | `todos` | `[{ id, text, done }]` | To-do list |
+| `todoOpen` | `true` / `false` | Whether the to-do panel is shown |
+| `game` | `{ level, score, youStart }` | Tic-tac-toe difficulty, score, and who starts next |
+| `layout` | `{ [widget]: { fx, fy } }` | Where you dragged each widget, as a fraction of the window size so it adapts to other screen sizes |
 | `background` | `{ date, photo }` | Today's photo, so new tabs don't call the API again (Unsplash allows 50 requests/hour) |
 | `weather` | `{ query, place, current, fetchedAt }` | 30-minute cache, plus last known weather when offline |
 
@@ -64,9 +69,11 @@ Why `chrome.storage.local` and not a database: the data is small, personal and o
 2. Type your **main focus** for today and press **Enter**. Tick the circle when it's done to grow your streak; hover and click **×** to clear it.
 3. **Pomodoro** (top left): **Start / Pause**, **↺** restarts the current phase, **⏭** skips to the next one. When a phase ends you hear a chime and the next phase waits for you to press Start.
 4. **Weather** (top right): click the city name, type another city, press **Enter**.
-5. **Todo** (bottom right): add items, tick them, delete them, **Clear completed**. The green badge counts open items.
-6. **⚙︎ Settings** (bottom right): every change is saved immediately. **Escape** or a click outside closes the panels.
-7. Hover the quote to see the author; click the photo credit to open the photo on Unsplash.
+5. **To-dos** (right, under the weather): type and press **Enter** to add, tick to complete, hover and click **×** to delete, **Clear completed** to tidy up. Hide the panel with **−**; the **Todo** button (bottom right, with a count of open items) shows it again.
+6. **Play** (bottom right): tic-tac-toe against a bot. You are X; choose **Easy** or **Hard**. During a Pomodoro break the timer also offers *"Break time: play a round"*.
+7. **Rearrange the page:** press and hold on an empty part of the background (or **⚙︎ Settings → Edit layout**). The widgets jiggle; drag them where you want and click **Done**. **Reset** puts everything back.
+8. **⚙︎ Settings** (bottom right): every change is saved immediately. **Escape** or a click outside closes the pop-up panels.
+9. Hover the quote to see the author; click the photo credit to open the photo on Unsplash.
 
 ## Setup
 
@@ -114,6 +121,8 @@ momentum-dash/
 │   ├── weather.js         # Open-Meteo geocoding + current weather
 │   ├── quote.js           # quote of the day
 │   ├── todos.js           # to-do list
+│   ├── game.js            # tic-tac-toe + bot (minimax)
+│   ├── layout.js          # edit-layout mode: drag widgets, save positions
 │   └── settings.js        # settings panel + defaults
 ├── data/quotes.json
 ├── assets/fallback/       # 5 bundled photos + credits.json
@@ -139,6 +148,7 @@ momentum-dash/
 - **Without `config.js`, Chrome logs one "file not found" message** in the console when the extension checks for the optional key. It is caught and the fallback photos are used.
 - **The Unsplash key is readable by anyone you give your copy to.** Access Keys are designed for client-side use, but don't share a copy that contains your `config.js`.
 - **Weather** is in °C only, and the city search uses the first match (e.g. "Paris" → Paris, France).
+- **Dragged widgets can overlap** each other; the layout only keeps every widget inside the window. On a much smaller window a custom layout can look cramped; **Reset** restores the default.
 - **No automated test suite.** I tested manually in Chrome and in a local preview, and checked the streak and Pomodoro rules in the browser console.
 - **Chrome only** (Chromium-based browsers); not published on the Chrome Web Store.
 
