@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Verdant Tab",
+  "short_name": "Verdant",
+  "version": "0.1.0",
+  "description": "A calm new-tab dashboard: daily photo, clock, focus of the day, Pomodoro timer and streak.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": ["storage"]
+}

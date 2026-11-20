@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Tab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="background" class="background" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <main class="layout">
+    <!-- top-left / top-right slots: filled in later milestones (links, weather) -->
+    <header class="top-row">
+      <div id="top-left"></div>
+      <div id="top-right"></div>
+    </header>
+
+    <section class="center">
+      <!-- First-run: ask for the user's name -->
+      <form id="name-prompt" class="name-prompt" hidden>
+        <label for="name-input">Hello, what's your name?</label>
+        <input id="name-input" type="text" autocomplete="off" maxlength="40" spellcheck="false">
+      </form>
+
+      <!-- Main view: clock + greeting -->
+      <div id="clock-view" hidden>
+        <time id="clock" class="clock"></time>
+        <p class="greeting">
+          <span id="greeting-text"></span><span id="greeting-name" class="greeting-name" title="Double-click to change your name"></span>.
+        </p>
+      </div>
+    </section>
+
+    <footer class="bottom-row">
+      <div id="bottom-left"></div>
+      <div id="bottom-center"></div>
+      <div id="bottom-right"></div>
+    </footer>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

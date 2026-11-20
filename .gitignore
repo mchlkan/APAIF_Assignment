@@ -226,6 +226,10 @@ __marimo__/
 _work/
 CLAUDE.local.md
 .claude/settings.local.json
+.claude/launch.json
 .DS_Store
 # Course brief (not ours to publish)
 individual-submission.pdf
+
+# Momentum Dash: real Unsplash key lives here (copy from config.example.js)
+momentum-dash/config.js

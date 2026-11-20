@@ -1,0 +1,128 @@
+/* ---------- Design tokens: dark, silver, dark green ---------- */
+:root {
+  --ink: #0b0f0d;            /* near-black base */
+  --panel: rgba(12, 18, 15, 0.45);
+  --panel-border: rgba(215, 219, 223, 0.12);
+  --silver: #e4e7ea;         /* primary text */
+  --silver-dim: #a7b0b5;     /* secondary text */
+  --green: #2f5d50;          /* accent */
+  --green-bright: #5a9a82;   /* accent on dark */
+  --radius: 14px;
+  --font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--silver);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Background layers ---------- */
+.background {
+  position: fixed;
+  inset: 0;
+  /* placeholder until a photo loads (milestone 2) */
+  background: radial-gradient(ellipse at 30% 20%, #1d3a31 0%, #0f1f1a 45%, var(--ink) 100%);
+  background-size: cover;
+  background-position: center;
+  transition: opacity 0.8s ease;
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.5) 100%),
+    radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.35) 100%);
+}
+
+/* ---------- Layout: 3 rows (top / center / bottom) ---------- */
+.layout {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 20px 28px;
+}
+
+.top-row, .bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  min-height: 40px;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Clock + greeting ---------- */
+.clock {
+  display: block;
+  font-size: clamp(5rem, 15vw, 10.5rem);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.greeting {
+  margin: 0.4em 0 0;
+  font-size: clamp(1.4rem, 3.4vw, 2.6rem);
+  font-weight: 500;
+  color: var(--silver);
+}
+
+.greeting-name {
+  cursor: text;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+.greeting-name:hover { border-color: var(--green-bright); }
+.greeting-name[contenteditable="true"] { outline: none; border-color: var(--silver-dim); }
+
+/* ---------- First-run name prompt ---------- */
+.name-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.name-prompt label {
+  font-size: clamp(1.6rem, 3.6vw, 2.8rem);
+  font-weight: 500;
+}
+.name-prompt input,
+.line-input {
+  width: min(520px, 80vw);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--silver);
+  color: var(--silver);
+  font: inherit;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  text-align: center;
+  padding: 4px 0;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.name-prompt input:focus,
+.line-input:focus { border-color: var(--green-bright); }
+
+[hidden] { display: none !important; }
+
+.fade-in { animation: fade-in 0.6s ease both; }
+@keyframes fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
