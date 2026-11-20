@@ -228,6 +228,8 @@ CLAUDE.local.md
 .claude/settings.local.json
 .claude/launch.json
 .DS_Store
+.Rhistory
+.RData
 # Course brief (not ours to publish)
 individual-submission.pdf
 
