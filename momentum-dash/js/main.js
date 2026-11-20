@@ -6,8 +6,10 @@ import { initFocus } from "./focus.js";
 import { initPomodoro } from "./pomodoro.js";
 import { initQuote } from "./quote.js";
 import { initWeather } from "./weather.js";
+import { initTodos } from "./todos.js";
+import { initSettings } from "./settings.js";
 
-const widgets = [initBackground, initClock, initFocus, initPomodoro, initQuote, initWeather];
+const widgets = [initSettings, initBackground, initClock, initFocus, initPomodoro, initQuote, initWeather, initTodos];
 
 for (const init of widgets) {
   init().catch((error) => console.error(`[${init.name}]`, error));

@@ -98,7 +98,53 @@
           <figcaption id="quote-author" class="quote-author"></figcaption>
         </figure>
       </div>
-      <div id="bottom-right"></div>
+      <div id="bottom-right">
+        <!-- Settings -->
+        <button id="settings-toggle" class="corner-button" type="button" aria-label="Settings" title="Settings" aria-expanded="false" aria-controls="settings-panel">
+          <span class="gear" aria-hidden="true">⚙︎</span>
+        </button>
+
+        <!-- To-dos -->
+        <button id="todo-toggle" class="corner-button todo-toggle" type="button" aria-expanded="false" aria-controls="todo-panel">
+          Todo <span id="todo-count" class="todo-count" hidden></span>
+        </button>
+
+        <section id="todo-panel" class="popover panel todo-panel" aria-label="To-do list" hidden>
+          <h2 class="popover-title">Today's to-dos</h2>
+          <ul id="todo-list" class="todo-list"></ul>
+          <p id="todo-empty" class="todo-empty">Nothing here yet. Add your first to-do below.</p>
+          <form id="todo-form">
+            <input id="todo-input" class="todo-input" type="text" placeholder="New to-do" autocomplete="off" maxlength="120">
+          </form>
+          <button id="todo-clear" class="text-button" type="button" hidden>Clear completed</button>
+        </section>
+
+        <section id="settings-panel" class="popover panel settings-panel" aria-label="Settings" hidden>
+          <h2 class="popover-title">Settings</h2>
+          <form id="settings-form" class="settings-form">
+            <fieldset>
+              <legend>General</legend>
+              <label class="row">Name <input name="name" type="text" maxlength="40" autocomplete="off"></label>
+              <label class="row">City (weather) <input name="city" type="text" maxlength="60" autocomplete="off"></label>
+              <label class="row">24-hour clock <input name="use24h" type="checkbox" class="switch"></label>
+            </fieldset>
+            <fieldset>
+              <legend>Show</legend>
+              <label class="row">Pomodoro timer <input name="show-pomodoro" type="checkbox" class="switch"></label>
+              <label class="row">Weather <input name="show-weather" type="checkbox" class="switch"></label>
+              <label class="row">Quote <input name="show-quote" type="checkbox" class="switch"></label>
+              <label class="row">To-dos <input name="show-todos" type="checkbox" class="switch"></label>
+            </fieldset>
+            <fieldset>
+              <legend>Pomodoro (minutes)</legend>
+              <label class="row">Focus <input name="duration-focus" type="number" min="1" max="180"></label>
+              <label class="row">Short break <input name="duration-short" type="number" min="1" max="180"></label>
+              <label class="row">Long break <input name="duration-long" type="number" min="1" max="180"></label>
+            </fieldset>
+          </form>
+          <button id="settings-reset" class="text-button danger" type="button">Reset all data</button>
+        </section>
+      </div>
     </footer>
   </main>
 

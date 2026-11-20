@@ -1,5 +1,6 @@
 // Clock + greeting ("Good evening, Michael") + first-run name prompt.
 import * as storage from "./storage.js";
+import { getSettings } from "./settings.js";
 
 const els = {
   prompt: document.getElementById("name-prompt"),
@@ -80,12 +81,18 @@ function enableNameEditing() {
 }
 
 export async function initClock() {
-  use24h = (await storage.get("settings", {})).use24h ?? true;
+  use24h = (await getSettings()).use24h;
   const name = await storage.get("name");
   if (name) showClock(name);
   else askForName();
 
   enableNameEditing();
+  // React to changes from the settings panel or other tabs.
+  storage.onChange("settings", async () => { use24h = (await getSettings()).use24h; tick(); });
+  storage.onChange("name", (next) => {
+    if (next && !els.name.isContentEditable) els.name.textContent = next;
+    if (!next) askForName();
+  });
   // Update on the next full second, then every second (cheap, keeps the minute change exact).
   setTimeout(() => { tick(); setInterval(tick, 1000); }, 1000 - (Date.now() % 1000));
 }

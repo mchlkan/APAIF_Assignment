@@ -8,9 +8,16 @@
 //                   endsAt (when running), remaining (ms, when idle/paused), round (focus rounds done in this cycle) }
 //   pomodoroLog = { date: "YYYY-MM-DD", count }   → completed focus rounds today
 import * as storage from "./storage.js";
+import { getSettings } from "./settings.js";
 
 const MINUTE = 60_000;
-export const DURATIONS = { focus: 25 * MINUTE, short: 5 * MINUTE, long: 15 * MINUTE };
+// Phase lengths in ms; defaults 25/5/15 min, adjustable in the settings panel.
+const DURATIONS = { focus: 25 * MINUTE, short: 5 * MINUTE, long: 15 * MINUTE };
+
+async function loadDurations() {
+  const { durations } = await getSettings();
+  for (const mode of Object.keys(DURATIONS)) DURATIONS[mode] = durations[mode] * MINUTE;
+}
 const LABELS = { focus: "Focus", short: "Short break", long: "Long break" };
 const ROUNDS_PER_CYCLE = 4;
 
@@ -108,7 +115,7 @@ function format(ms) {
 function render() {
   if (!state) return;
   const remaining = remainingMs(state);
-  const progress = 1 - remaining / DURATIONS[state.mode];
+  const progress = Math.min(1, Math.max(0, 1 - remaining / DURATIONS[state.mode]));
 
   els.time.textContent = format(remaining);
   els.ring.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - progress));
@@ -144,7 +151,17 @@ function bindEvents() {
 }
 
 export async function initPomodoro() {
+  await loadDurations();
   state = (await storage.get("pomodoro")) ?? fresh("focus");
+
+  // New durations from the settings panel apply right away to a timer that hasn't started yet;
+  // a running or paused phase keeps its length.
+  storage.onChange("settings", async () => {
+    await loadDurations();
+    if (state.status === "idle" && state.remaining !== DURATIONS[state.mode]) {
+      save(fresh(state.mode, state.round));
+    }
+  });
   els.ring.style.strokeDasharray = String(CIRCUMFERENCE);
   bindEvents();
   render();

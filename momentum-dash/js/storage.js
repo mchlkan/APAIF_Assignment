@@ -13,6 +13,12 @@ export async function get(key, fallback = null) {
   return raw === null ? fallback : JSON.parse(raw);
 }
 
+// Remove everything this extension stored (used by "Reset all data" in settings).
+export async function clearAll() {
+  if (chromeStore) await chromeStore.clear();
+  else localStorage.clear();
+}
+
 // Same-tab listeners for the localStorage fallback (chrome.storage notifies the same tab by itself).
 const localListeners = [];
 

@@ -4,9 +4,9 @@
 // Cached for 30 minutes so opening many tabs doesn't call the API every time.
 // Click the city name to change it (Enter saves, Escape cancels).
 import * as storage from "./storage.js";
+import { getSettings } from "./settings.js";
 
 const CACHE_MS = 30 * 60_000;
-const DEFAULT_CITY = "Lisbon";
 
 const els = {
   root: document.getElementById("weather"),
@@ -60,7 +60,7 @@ async function fetchWeather(place) {
 }
 
 async function getCity() {
-  return (await storage.get("settings", {})).city || DEFAULT_CITY;
+  return (await getSettings()).city;
 }
 
 async function load({ force = false } = {}) {
@@ -117,15 +117,20 @@ function enableCityEditing() {
     delete els.city.dataset.cancel;
     const city = els.city.textContent.trim();
     if (cancelled || !city || city === (await getCity())) return load();
-    const settings = await storage.get("settings", {});
-    await storage.set("settings", { ...settings, city });
-    load({ force: true });
+    await storage.set("settings", { ...(await getSettings()), city });
+    // the settings listener below reloads the weather
   });
 }
 
 export async function initWeather() {
   enableCityEditing();
   storage.onChange("weather", (entry) => entry && render(entry)); // other tabs
+  // City changed (here, in the settings panel, or in another tab) → reload.
+  let city = await getCity();
+  storage.onChange("settings", async () => {
+    const next = await getCity();
+    if (next !== city) { city = next; load(); }
+  });
   await load();
   setInterval(load, CACHE_MS); // refresh while a tab stays open
 }
