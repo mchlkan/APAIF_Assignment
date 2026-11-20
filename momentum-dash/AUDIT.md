@@ -29,7 +29,7 @@ The raw report of each run was kept outside the repository. Below is the sanitiz
 | # | Finding | Type | Decision | What I did |
 |---|---|---|---|---|
 | 1.1 | README links a screenshot that doesn't exist (`docs/` was empty) | Confirmed | **Fixed** | Added `docs/screenshot.jpg` and `docs/screenshot-edit-mode.jpg`: page only, demo to-dos, no real location; compressed to under 200 KB each |
-| 1.2 | The default branch `main` didn't contain the project yet, so a fresh clone couldn't follow the README setup | Confirmed | **Fixed** | Project merged into `main` via pull request; verified with a fresh clone (see *Verification*) |
+| 1.2 | The default branch `main` didn't contain the project yet, so a fresh clone couldn't follow the README setup | Confirmed | **To fix (planned)** | Merge the project into `main` via pull request after the re-check, then verify with a fresh clone (see *Verification*) |
 | 1.3 | Root README promises an `AUDIT.md`, but none existed | Confirmed | **Fixed** | This file |
 | 1.4a | `LICENSE` contained a student number | Possible | **Fixed** | The copyright line now shows my first name only |
 | 1.4b | Commit metadata contains my personal email address | Possible | **Partly fixed** | I switched to GitHub's private noreply address, so all commits from the audit fixes onward use it. I did **not** rewrite the already-published history: that needs a force-push, which is risky and makes the Git history harder to follow. See *Remaining limitations* |
