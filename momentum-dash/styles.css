@@ -8,6 +8,9 @@
   --green: #2f5d50;          /* accent */
   --green-bright: #5a9a82;   /* accent on dark */
   --radius: 14px;
+  /* widget grid (like phone widgets): one unit + gap; medium = 2x1 units, large = 2x2 units */
+  --unit: 120px;
+  --gap: 12px;
   --font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -48,19 +51,19 @@ html, body {
   position: relative;
   height: 100%;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 1fr auto;
   padding: 20px 28px;
 }
 
-.top-row, .bottom-row {
+.bottom-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: 16px;
   min-height: 40px;
 }
-.top-row { align-items: flex-start; }
-#top-right { position: relative; display: flex; flex-direction: column; align-items: flex-end; }
+/* The hero (clock, greeting, focus) never grows into the two widget columns on each side. */
+.center > * { max-width: max(320px, calc(100vw - 2 * (20px + 2 * var(--unit) + var(--gap)) - 2 * var(--gap))); }
 
 .center {
   display: flex;
@@ -74,7 +77,7 @@ html, body {
 /* ---------- Clock + greeting ---------- */
 .clock {
   display: block;
-  font-size: clamp(5rem, 15vw, 10.5rem);
+  font-size: clamp(4.5rem, 12vw, 10rem);
   font-weight: 500;
   letter-spacing: -0.035em;
   line-height: 1;
@@ -149,9 +152,9 @@ html, body {
 .focus-input:focus { border-color: var(--green-bright); background: rgba(12, 18, 15, 0.6); }
 
 .focus-heading {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
   gap: 10px;
   margin: 0 0 10px;
   font-size: 0.8rem;
@@ -160,6 +163,8 @@ html, body {
   text-transform: uppercase;
   color: var(--silver-dim);
 }
+
+.focus-badges { display: flex; gap: 8px; justify-self: start; }
 
 .streak {
   letter-spacing: 0.04em;
@@ -173,17 +178,22 @@ html, body {
   text-shadow: none;
 }
 
+/* checkbox | text | ×  — the text sits in the middle column, so it is exactly centered */
 .focus-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
   gap: 14px;
   font-size: clamp(1.3rem, 2.8vw, 2rem);
   font-weight: 500;
 }
 
-.focus-text { transition: color 0.3s, text-decoration-color 0.3s; text-decoration: line-through transparent 2px; }
-.focus-view.is-done .focus-text { color: var(--silver-dim); text-decoration-color: var(--green-bright); }
+/* The strike-through exists only when done: an invisible (transparent) line would still
+   be painted by Chrome when the text is selected. */
+.focus-text { transition: color 0.3s; }
+.focus-row .focus-check { justify-self: end; }
+.focus-row .icon-button { justify-self: start; }
+.focus-view.is-done .focus-text { color: var(--silver-dim); text-decoration: line-through var(--green-bright) 2px; }
 
 /* custom round checkbox */
 .focus-check {
@@ -272,11 +282,11 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
 .pomodoro {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 16px 12px 12px;
+  gap: 12px;
+  padding: 12px 14px;
 }
 
-.pomo-ring { position: relative; width: 72px; height: 72px; flex: none; }
+.pomo-ring { position: relative; width: 64px; height: 64px; flex: none; }
 .pomo-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .pomo-ring circle { fill: none; stroke-width: 4; }
 .pomo-ring-track { stroke: rgba(228, 231, 234, 0.15); }
@@ -301,7 +311,20 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
 .pomo-side { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
 .pomo-label { font-weight: 600; font-size: 0.95rem; }
 .pomo-round { font-size: 0.78rem; color: var(--silver-dim); }
-.pomo-controls { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+.pomo-controls { display: flex; gap: 5px; margin-top: 8px; align-items: center; }
+/* fixed width, so "Start" / "Pause" / "Resume" never push the other buttons out of the box */
+.pomo-controls .pill-button { min-width: 74px; padding: 4px 10px; }
+.pomo-controls .small-button { width: 26px; height: 26px; flex: none; }
+
+/* ----- Box sizes (data-w / data-h are set by js/layout.js, in grid slots) ----- */
+/* timer 3x1: more room */
+.pomodoro[data-w="3"][data-h="1"] { gap: 22px; padding: 12px 26px; }
+.pomodoro[data-w="3"][data-h="1"] .pomo-ring { width: 84px; height: 84px; }
+/* timer 2x2 / 3x2: stacked, big ring */
+.pomodoro[data-h="2"] { flex-direction: column; justify-content: center; gap: 12px; }
+.pomodoro[data-h="2"] .pomo-ring { width: 120px; height: 120px; }
+.pomodoro[data-h="2"] .pomo-time { font-size: 1.5rem; }
+.pomodoro[data-h="2"] .pomo-side { align-items: center; }
 
 .pomodoro[data-status="running"] .pomo-time { color: var(--silver); }
 .pomodoro[data-status="paused"] .pomo-time { animation: blink 1.6s ease-in-out infinite; }
@@ -318,21 +341,34 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
   border-radius: 999px;
 }
 
-/* ---------- Weather ---------- */
+/* ---------- Widget grid ---------- */
+/* layers: photo < grid slots (edit mode) < boxes < pop-ups (settings) < edit bar */
+.widgets { position: fixed; inset: 0; pointer-events: none; z-index: 2; }
+.widget {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: auto;
+  overflow: hidden;
+  visibility: hidden; /* until js/layout.js has put it in its slot → no flash in the wrong place */
+}
+.widget.placed { visibility: visible; }
+.size-m { width: calc(2 * var(--unit) + var(--gap)); height: var(--unit); }
+.size-l { width: calc(2 * var(--unit) + var(--gap)); height: calc(2 * var(--unit) + var(--gap)); }
+
+/* ---------- Weather (medium) ---------- */
 .weather {
-  text-align: right;
-  min-width: 150px;
-  min-height: 96px; /* same height as the Pomodoro panel */
-  padding: 12px 18px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
 }
 .weather p { margin: 0; }
-.weather-main { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.weather-main { display: flex; align-items: center; gap: 8px; }
 .weather-icon { font-size: 1.5rem; color: var(--silver-dim); }
-.weather-temp { font-size: 2rem; font-weight: 500; font-variant-numeric: tabular-nums; }
-.weather-sub { font-size: 0.85rem; color: var(--silver); opacity: 0.85; }
+.weather-temp { font-size: 2.6rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.weather-sub { display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; color: var(--silver); opacity: 0.9; min-width: 0; }
 .weather-city {
   color: var(--silver);
   font-weight: 600;
@@ -343,7 +379,21 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
 }
 .weather-city:hover { border-color: var(--green-bright); }
 .weather-city[contenteditable="true"] { border-color: var(--silver-dim); }
-.weather-desc::before { content: " · "; }
+.weather-desc { color: var(--silver-dim); }
+
+/* weather 1x1: compact, centered */
+.weather[data-w="1"] { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 2px; padding: 10px; }
+.weather[data-w="1"] .weather-temp { font-size: 2rem; }
+.weather[data-w="1"] .weather-icon { font-size: 1.2rem; }
+.weather[data-w="1"] .weather-sub { align-items: center; font-size: 0.8rem; }
+/* weather 3x1: bigger temperature */
+.weather[data-w="3"] { gap: 26px; padding: 14px 28px; }
+.weather[data-w="3"] .weather-temp { font-size: 3.2rem; }
+/* weather 2 rows high: stacked and big */
+.weather[data-h="2"] { grid-template-columns: 1fr; justify-items: center; align-content: center; text-align: center; gap: 8px; }
+.weather[data-h="2"] .weather-temp { font-size: 3.6rem; }
+.weather[data-h="2"] .weather-icon { font-size: 2rem; }
+.weather[data-h="2"] .weather-sub { align-items: center; font-size: 1rem; }
 
 /* ---------- Quote ---------- */
 #bottom-center { flex: 1; display: flex; justify-content: center; }
@@ -359,7 +409,8 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
 }
 .quote:hover .quote-author { opacity: 1; transform: none; }
 
-#bottom-left, #bottom-right { flex: 0 0 220px; }
+#bottom-left { flex: 0 1 220px; }
+#bottom-right { flex: 0 0 auto; }
 #bottom-right { display: flex; justify-content: flex-end; }
 
 /* ---------- Corner buttons + pop-up panels (to-dos, settings) ---------- */
@@ -384,9 +435,9 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
 .todo-count {
   display: inline-grid;
   place-content: center;
-  min-width: 20px;
-  height: 20px;
-  margin-left: 4px;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 2px;
   padding: 0 6px;
   border-radius: 999px;
   background: var(--green);
@@ -395,7 +446,7 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
 }
 
 .popover {
-  z-index: 2;
+  z-index: 3;
   position: absolute;
   right: 0;
   bottom: calc(100% + 12px);
@@ -409,22 +460,41 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
 }
 .popover-title { margin: 0 0 10px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--silver-dim); }
 
-/* to-do list: persistent panel under the weather */
-.todo-panel {
-  position: absolute;
-  top: calc(100% + 12px);
-  right: 0;
-  width: clamp(200px, 22vw, 280px);
-  max-height: calc(100vh - 300px);
-  overflow-y: auto;
-  padding: 14px 16px;
-  text-align: left;
-  animation: fade-in 0.2s ease both;
-  z-index: 1;
-}
+/* large boxes: header + content that fills the rest of the box */
+.todo-panel, .game-panel { display: flex; flex-direction: column; padding: 14px 16px; text-align: left; }
+/* to-dos one slot wide: tighter */
+.todo-panel[data-w="1"] { padding: 12px; }
+.todo-panel[data-w="1"] .popover-title { white-space: nowrap; letter-spacing: 0.06em; }
+.todo-panel[data-w="1"] .todo-item { font-size: 0.85rem; gap: 8px; }
+/* game: bigger board in bigger boxes */
+.game-panel[data-h="3"] { --cell: 64px; }
+.game-panel[data-w="3"][data-h="3"] { --cell: 80px; }
+.game-panel[data-h="3"] .game-cell { font-size: 2rem; }
+.todo-panel .todo-list { flex: 1; overflow-y: auto; min-height: 0; }
 .panel-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
 .panel-header .popover-title { margin: 0; }
-.icon-button.always { opacity: 1; }
+/* − button to put a box away: top-right corner, appears on hover */
+.hide-button {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--silver-dim);
+  font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, color 0.2s;
+}
+.hide-button.in-header { position: static; opacity: 0.7; }
+.panel:hover .hide-button, .hide-button:focus-visible { opacity: 1; }
+.hide-button:hover { color: var(--silver); background: rgba(255, 255, 255, 0.08); }
 
 .todo-list { list-style: none; margin: 0; padding: 0; }
 .todo-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 0.95rem; }
@@ -516,8 +586,43 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
 .switch:checked::after { transform: translateX(16px); }
 .switch:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2px; }
 
+/* ---------- Dock: show / put away boxes ---------- */
+.dock { display: flex; gap: 2px; }
+.dock-button {
+  background: none;
+  border: none;
+  color: var(--silver-dim);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 6px 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+  transition: color 0.2s, background 0.2s;
+}
+.dock-button { display: flex; flex-direction: column; align-items: center; }
+/* every label has the same height, with or without the to-do count badge */
+.dock-label { display: inline-flex; align-items: center; gap: 4px; height: 20px; line-height: 20px; }
+.dock-button:hover { background: rgba(12, 18, 15, 0.35); color: var(--silver); }
+.dock-button[aria-pressed="true"] { color: var(--silver); }
+.dock-button[aria-pressed="true"]::after {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 4px;
+  margin: 3px auto 0;
+  border-radius: 50%;
+  background: var(--green-bright);
+}
+.dock-button[aria-pressed="false"]::after { content: ""; display: block; height: 4px; margin-top: 3px; }
+
 /* ---------- Mini game: tic-tac-toe ---------- */
-.game-panel { width: 280px; }
+.game-panel .popover-title { white-space: nowrap; letter-spacing: 0.08em; }
+.game-panel .panel-header { gap: 6px; }
+.game-panel .segmented button { padding: 3px 8px; }
+.game-score { white-space: nowrap; }
+.game-panel .segmented { margin-left: auto; }
 .segmented { display: inline-flex; border: 1px solid var(--panel-border); border-radius: 999px; overflow: hidden; }
 .segmented button {
   background: none;
@@ -533,18 +638,20 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
 
 .game-board {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, var(--cell, 42px));
   gap: 6px;
-  margin: 10px 0 8px;
+  justify-content: center;
+  margin: 8px 0 6px;
 }
 .game-cell {
   aspect-ratio: 1;
+  width: var(--cell, 42px);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--panel-border);
   border-radius: 10px;
   color: var(--silver);
   font: inherit;
-  font-size: 2rem;
+  font-size: 1.35rem;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
@@ -555,9 +662,10 @@ button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2
 .game-cell[data-mark="O"] { color: var(--green-bright); }
 .game-cell.win { background: rgba(47, 93, 80, 0.55); border-color: var(--green-bright); }
 
-.game-status { margin: 0 0 8px; min-height: 1.2em; font-size: 0.92rem; text-align: center; }
-.game-footer { display: flex; justify-content: space-between; align-items: center; }
-.game-score { font-size: 0.8rem; color: var(--silver-dim); }
+.game-status { margin: 0 0 6px; min-height: 1.2em; font-size: 0.85rem; text-align: center; }
+.game-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+.game-footer .pill-button { padding: 3px 12px; font-size: 0.78rem; }
+.game-score { font-size: 0.74rem; color: var(--silver-dim); }
 
 .pomo-play { margin-top: 6px; font-size: 0.78rem; color: var(--green-bright); }
 
@@ -572,9 +680,59 @@ body.editing [data-widget] {
   animation: jiggle 0.35s ease-in-out infinite alternate;
 }
 /* the contents can't be clicked while editing, only the widget as a whole can be dragged */
-body.editing [data-widget] > * { pointer-events: none; }
+body.editing [data-widget] > *:not(.resize-handle) { pointer-events: none; }
 body.editing [data-widget]:nth-of-type(odd) { animation-delay: -0.17s; }
 body.editing [data-widget].dragging { cursor: grabbing; animation: none; z-index: 5; outline-color: var(--green-bright); }
+body.editing [data-widget].blocked { outline-color: #e08a8a; }
+/* after a drop, glide into the free spot */
+[data-widget].snapping { transition: left 0.25s ease, top 0.25s ease; }
+
+/* resize handle: bottom-right corner, only in edit mode */
+.resize-handle {
+  display: none;
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 16px;
+  height: 16px;
+  border-right: 3px solid var(--silver);
+  border-bottom: 3px solid var(--silver);
+  border-bottom-right-radius: 6px;
+  cursor: nwse-resize;
+  opacity: 0.85;
+  z-index: 2;
+}
+body.editing .resize-handle { display: block; }
+/* boxes on the right side: handle in the bottom-left corner, they grow towards the middle */
+[data-anchor="r"] > .resize-handle {
+  right: auto;
+  left: 5px;
+  border-right: none;
+  border-left: 3px solid var(--silver);
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 6px;
+  cursor: nesw-resize;
+}
+body.editing [data-widget].resizing { animation: none; outline-color: var(--green-bright); }
+
+/* empty grid slots shown in edit mode */
+.grid-slots { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+.grid-slot {
+  position: absolute;
+  width: var(--unit);
+  height: var(--unit);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(228, 231, 234, 0.18);
+}
+.grid-target {
+  position: absolute;
+  border-radius: var(--radius);
+  border: 2px solid var(--green-bright);
+  background: rgba(90, 154, 130, 0.15);
+  transition: left 0.1s, top 0.1s;
+}
+.grid-target.blocked { border-color: #e08a8a; background: rgba(224, 138, 138, 0.12); }
 /* `rotate` is separate from `translate`, so the jiggle doesn't fight the drag position */
 @keyframes jiggle { from { rotate: -0.6deg; } to { rotate: 0.6deg; } }
 
@@ -601,8 +759,8 @@ body.editing [data-widget].dragging { cursor: grabbing; animation: none; z-index
 body.hide-pomodoro #pomodoro,
 body.hide-weather #weather,
 body.hide-quote #quote,
-body.hide-todos #todo-toggle,
-body.hide-todos #todo-panel { display: none !important; }
+body.hide-todos #todo-panel,
+body.hide-game #game-panel { display: none !important; }
 
 /* ---------- Photo credit (required by Unsplash) ---------- */
 .photo-credit {
@@ -615,6 +773,8 @@ body.hide-todos #todo-panel { display: none !important; }
 .photo-credit:hover { opacity: 1; }
 .photo-credit a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(167, 176, 181, 0.4); }
 .photo-credit a:hover { color: var(--silver); border-color: var(--green-bright); }
+
+::selection { background: rgba(90, 154, 130, 0.55); color: #fff; }
 
 [hidden] { display: none !important; }
 

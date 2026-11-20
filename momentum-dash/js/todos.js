@@ -1,17 +1,14 @@
-// To-do list in a panel under the weather. It stays open until hidden (− or the Todo button).
-// Stored data: todos = [{ id, text, done }], todoOpen = true|false
+// To-do list in a panel under the weather. Showing / putting it away is handled in settings.js.
+// Stored data: todos = [{ id, text, done }]
 import * as storage from "./storage.js";
 
 const els = {
-  toggle: document.getElementById("todo-toggle"),
   count: document.getElementById("todo-count"),
-  panel: document.getElementById("todo-panel"),
   list: document.getElementById("todo-list"),
   empty: document.getElementById("todo-empty"),
   form: document.getElementById("todo-form"),
   input: document.getElementById("todo-input"),
   clear: document.getElementById("todo-clear"),
-  collapse: document.getElementById("todo-collapse"),
 };
 
 let todos = [];
@@ -59,21 +56,9 @@ function render() {
   els.clear.hidden = !todos.some((t) => t.done);
 }
 
-// The panel stays open (also across new tabs) until the user hides it.
-function setOpen(open, { save: persist = true, focus = false } = {}) {
-  els.panel.hidden = !open;
-  els.toggle.setAttribute("aria-expanded", String(open));
-  if (persist) storage.set("todoOpen", open);
-  if (open && focus) els.input.focus();
-}
-
 export async function initTodos() {
   todos = await storage.get("todos", []);
   render();
-  setOpen(await storage.get("todoOpen", true), { save: false });
-
-  els.toggle.addEventListener("click", () => setOpen(els.panel.hidden, { focus: true }));
-  els.collapse.addEventListener("click", () => setOpen(false));
   els.form.addEventListener("submit", (event) => {
     event.preventDefault();
     const text = els.input.value.trim();
@@ -84,5 +69,4 @@ export async function initTodos() {
   els.clear.addEventListener("click", () => save(todos.filter((t) => !t.done)));
 
   storage.onChange("todos", (next) => { todos = next ?? []; render(); });
-  storage.onChange("todoOpen", (open) => setOpen(open ?? true, { save: false }));
 }

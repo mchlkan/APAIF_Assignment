@@ -12,59 +12,6 @@
   <div class="vignette" aria-hidden="true"></div>
 
   <main class="layout">
-        <header class="top-row">
-      <div id="top-left">
-        <!-- Pomodoro timer -->
-        <section id="pomodoro" class="pomodoro panel" aria-label="Pomodoro timer">
-          <div class="pomo-ring">
-            <svg viewBox="0 0 64 64" aria-hidden="true">
-              <circle class="pomo-ring-track" cx="32" cy="32" r="28"></circle>
-              <circle id="pomo-ring-progress" class="pomo-ring-progress" cx="32" cy="32" r="28"></circle>
-            </svg>
-            <span id="pomo-time" class="pomo-time" role="timer">25:00</span>
-          </div>
-          <div class="pomo-side">
-            <span id="pomo-label" class="pomo-label">Focus</span>
-            <span id="pomo-round" class="pomo-round">Round 1 of 4</span>
-            <div class="pomo-controls">
-              <button id="pomo-toggle" class="pill-button" type="button">Start</button>
-              <button id="pomo-reset" class="small-button" type="button" title="Restart this phase" aria-label="Restart this phase">↺</button>
-              <button id="pomo-skip" class="small-button" type="button" title="Skip to next phase" aria-label="Skip to next phase">⏭︎</button>
-            </div>
-            <!-- shown during breaks: opens the mini game -->
-            <button id="pomo-play" class="text-button pomo-play" type="button" data-opens-game hidden>Break time: play a round ›</button>
-          </div>
-        </section>
-      </div>
-      <div id="top-right">
-        <!-- Weather (Open-Meteo) -->
-        <section id="weather" class="weather panel" aria-label="Current weather" hidden>
-          <p class="weather-main">
-            <span id="weather-icon" class="weather-icon" aria-hidden="true"></span>
-            <span id="weather-temp" class="weather-temp"></span>
-          </p>
-          <p class="weather-sub">
-            <span id="weather-city" class="weather-city" title="Click to change city"></span>
-            <span id="weather-desc" class="weather-desc"></span>
-          </p>
-        </section>
-
-        <!-- To-do list: stays open; collapse with − or the Todo button -->
-        <section id="todo-panel" class="panel todo-panel" aria-label="To-do list" hidden>
-          <div class="panel-header">
-            <h2 class="popover-title">To-dos</h2>
-            <button id="todo-collapse" class="icon-button always" type="button" aria-label="Hide to-do list" title="Hide">−</button>
-          </div>
-          <ul id="todo-list" class="todo-list"></ul>
-          <p id="todo-empty" class="todo-empty">Nothing here yet. Add your first to-do below.</p>
-          <form id="todo-form">
-            <input id="todo-input" class="todo-input" type="text" placeholder="New to-do" autocomplete="off" maxlength="120">
-          </form>
-          <button id="todo-clear" class="text-button" type="button" hidden>Clear completed</button>
-        </section>
-      </div>
-    </header>
-
     <section class="center">
       <!-- First-run: ask for the user's name -->
       <form id="name-prompt" class="name-prompt" hidden>
@@ -87,10 +34,14 @@
           </form>
 
           <div id="focus-view" class="focus-view" hidden>
+            <!-- 3 columns (1fr | auto | 1fr) so "Today" and the focus text are exactly centered -->
             <p class="focus-heading">
+              <span></span>
               <span>Today</span>
-              <span id="streak" class="streak" hidden></span>
-              <span id="pomo-count" class="pomo-count" title="Focus rounds completed today" hidden></span>
+              <span class="focus-badges">
+                <span id="streak" class="streak" hidden></span>
+                <span id="pomo-count" class="pomo-count" title="Focus rounds completed today" hidden></span>
+              </span>
             </p>
             <div class="focus-row">
               <input id="focus-done" type="checkbox" class="focus-check" aria-label="Mark focus as done">
@@ -120,30 +71,15 @@
           <span class="gear" aria-hidden="true">⚙︎</span>
         </button>
 
-        <!-- Mini game -->
-        <button id="game-toggle" class="corner-button" type="button" aria-expanded="false" aria-controls="game-panel" title="Play tic-tac-toe against a bot">Play</button>
+        <!-- Dock: show or put away each box -->
+        <nav class="dock" aria-label="Show or hide widgets">
+          <button type="button" class="dock-button" data-toggle="pomodoro"><span class="dock-label">Timer</span></button>
+          <button type="button" class="dock-button" data-toggle="weather"><span class="dock-label">Weather</span></button>
+          <button type="button" class="dock-button" data-toggle="todos"><span class="dock-label">To-dos <span id="todo-count" class="todo-count" hidden></span></span></button>
+          <button type="button" class="dock-button" data-toggle="game"><span class="dock-label">Game</span></button>
+        </nav>
 
-        <!-- To-dos -->
-        <button id="todo-toggle" class="corner-button todo-toggle" type="button" aria-expanded="false" aria-controls="todo-panel">
-          Todo <span id="todo-count" class="todo-count" hidden></span>
-        </button>
 
-
-        <section id="game-panel" class="popover panel game-panel" aria-label="Tic-tac-toe" hidden>
-          <div class="panel-header">
-            <h2 class="popover-title">Tic-tac-toe</h2>
-            <div class="segmented" role="group" aria-label="Difficulty">
-              <button type="button" data-level="easy">Easy</button>
-              <button type="button" data-level="hard">Hard</button>
-            </div>
-          </div>
-          <div id="game-board" class="game-board" role="grid" aria-label="Board"></div>
-          <p id="game-status" class="game-status" aria-live="polite"></p>
-          <div class="game-footer">
-            <span id="game-score" class="game-score"></span>
-            <button id="game-new" class="pill-button" type="button">New game</button>
-          </div>
-        </section>
 
         <section id="settings-panel" class="popover panel settings-panel" aria-label="Settings" hidden>
           <h2 class="popover-title">Settings</h2>
@@ -160,6 +96,7 @@
               <label class="row">Weather <input name="show-weather" type="checkbox" class="switch"></label>
               <label class="row">Quote <input name="show-quote" type="checkbox" class="switch"></label>
               <label class="row">To-dos <input name="show-todos" type="checkbox" class="switch"></label>
+              <label class="row">Tic-tac-toe <input name="show-game" type="checkbox" class="switch"></label>
             </fieldset>
             <fieldset>
               <legend>Pomodoro (minutes)</legend>
@@ -177,6 +114,79 @@
       </div>
     </footer>
   </main>
+
+
+  <!-- Widget grid: boxes sit in grid slots (medium = 2x1 units, large = 2x2 units).
+       Positions are set by js/layout.js; boxes stay invisible until placed. -->
+  <div id="widgets" class="widgets">
+    <!-- Pomodoro timer -->
+    <section id="pomodoro" class="widget size-m pomodoro panel" aria-label="Pomodoro timer">
+      <button class="hide-button" type="button" data-hide="pomodoro" aria-label="Put the timer away" title="Put away">−</button>
+      <div class="pomo-ring">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <circle class="pomo-ring-track" cx="32" cy="32" r="28"></circle>
+          <circle id="pomo-ring-progress" class="pomo-ring-progress" cx="32" cy="32" r="28"></circle>
+        </svg>
+        <span id="pomo-time" class="pomo-time" role="timer">25:00</span>
+      </div>
+      <div class="pomo-side">
+        <span id="pomo-label" class="pomo-label">Focus</span>
+        <span id="pomo-round" class="pomo-round">Round 1 of 4</span>
+        <div class="pomo-controls">
+          <button id="pomo-toggle" class="pill-button" type="button">Start</button>
+          <button id="pomo-reset" class="small-button" type="button" title="Restart this phase" aria-label="Restart this phase">↺</button>
+          <button id="pomo-skip" class="small-button" type="button" title="Skip to next phase" aria-label="Skip to next phase">⏭︎</button>
+        </div>
+        <!-- shown during breaks: opens the mini game -->
+        <button id="pomo-play" class="text-button pomo-play" type="button" hidden>Break time: play a round ›</button>
+      </div>
+    </section>
+
+    <!-- Tic-tac-toe (put away with −, bring back from the dock) -->
+    <section id="game-panel" class="widget size-l panel game-panel" aria-label="Tic-tac-toe">
+      <div class="panel-header">
+        <h2 class="popover-title">Tic-tac-toe</h2>
+        <div class="segmented" role="group" aria-label="Difficulty">
+          <button type="button" data-level="easy">Easy</button>
+          <button type="button" data-level="hard">Hard</button>
+        </div>
+        <button class="hide-button in-header" type="button" data-hide="game" aria-label="Put the game away" title="Put away">−</button>
+      </div>
+      <div id="game-board" class="game-board" role="grid" aria-label="Board"></div>
+      <p id="game-status" class="game-status" aria-live="polite"></p>
+      <div class="game-footer">
+        <span id="game-score" class="game-score"></span>
+        <button id="game-new" class="pill-button" type="button" title="Start a new game">New</button>
+      </div>
+    </section>
+
+    <!-- Weather (Open-Meteo) -->
+    <section id="weather" class="widget size-m weather panel" aria-label="Current weather">
+      <button class="hide-button" type="button" data-hide="weather" aria-label="Put the weather away" title="Put away">−</button>
+      <p class="weather-main">
+        <span id="weather-icon" class="weather-icon" aria-hidden="true"></span>
+        <span id="weather-temp" class="weather-temp"></span>
+      </p>
+      <p class="weather-sub">
+        <span id="weather-city" class="weather-city" title="Click to change city"></span>
+        <span id="weather-desc" class="weather-desc"></span>
+      </p>
+    </section>
+
+    <!-- To-do list (put away with −, bring back from the dock) -->
+    <section id="todo-panel" class="widget size-l panel todo-panel" aria-label="To-do list">
+      <div class="panel-header">
+        <h2 class="popover-title">To-dos</h2>
+        <button class="hide-button in-header" type="button" data-hide="todos" aria-label="Put the to-do list away" title="Put away">−</button>
+      </div>
+      <ul id="todo-list" class="todo-list"></ul>
+      <p id="todo-empty" class="todo-empty">Nothing here yet. Add your first to-do below.</p>
+      <form id="todo-form">
+        <input id="todo-input" class="todo-input" type="text" placeholder="New to-do" autocomplete="off" maxlength="120">
+      </form>
+      <button id="todo-clear" class="text-button" type="button" hidden>Clear completed</button>
+    </section>
+  </div>
 
   <script type="module" src="js/main.js"></script>
 </body>

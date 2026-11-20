@@ -4,6 +4,7 @@
 //   Hard: the bot uses minimax (it searches every possible game), so it never loses.
 // Stored data: game = { level: "easy"|"hard", score: { you, bot, draw }, youStart }
 import * as storage from "./storage.js";
+import { setShown } from "./settings.js";
 
 const LINES = [
   [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
@@ -12,8 +13,6 @@ const LINES = [
 ];
 
 const els = {
-  toggle: document.getElementById("game-toggle"),
-  panel: document.getElementById("game-panel"),
   board: document.getElementById("game-board"),
   status: document.getElementById("game-status"),
   score: document.getElementById("game-score"),
@@ -90,7 +89,7 @@ function renderBoard(winLine = []) {
 
 function renderMeta() {
   const { you, bot, draw } = prefs.score;
-  els.score.textContent = `You ${you} · Bot ${bot} · Draws ${draw}`;
+  els.score.textContent = `You ${you} · Bot ${bot} · Draw ${draw}`;
   els.levels.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.level === prefs.level)));
 }
 
@@ -144,14 +143,9 @@ function newGame() {
 
 // ---------- panel ----------
 
+// Used by the Pomodoro "Break time: play a round" link.
 export function openGame() {
-  els.panel.hidden = false;
-  els.toggle.setAttribute("aria-expanded", "true");
-}
-
-function closeGame() {
-  els.panel.hidden = true;
-  els.toggle.setAttribute("aria-expanded", "false");
+  return setShown("game", true);
 }
 
 export async function initGame() {
@@ -159,7 +153,6 @@ export async function initGame() {
   renderMeta();
   newGame();
 
-  els.toggle.addEventListener("click", () => (els.panel.hidden ? openGame() : closeGame()));
   els.newGame.addEventListener("click", newGame);
   els.levels.forEach((button) => button.addEventListener("click", () => {
     prefs.level = button.dataset.level;
@@ -168,13 +161,4 @@ export async function initGame() {
     newGame();
   }));
 
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeGame(); });
-  // Close on a click outside. composedPath() is the path at click time: a board cell that was
-  // replaced by the re-render is no longer "inside" the panel, but it still is in this path.
-  document.addEventListener("click", (e) => {
-    const path = e.composedPath();
-    const inside = path.includes(els.panel) || path.includes(els.toggle)
-      || path.some((node) => node.dataset?.opensGame !== undefined);
-    if (!els.panel.hidden && !inside) closeGame();
-  });
 }

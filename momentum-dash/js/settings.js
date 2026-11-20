@@ -3,13 +3,16 @@
 //
 // Stored data:
 //   name     = "Michael"   (separate key, also edited from the greeting)
-//   settings = { city, use24h, show: { pomodoro, weather, quote, todos }, durations: { focus, short, long } (minutes) }
+//   settings = { city, use24h, show: { pomodoro, weather, quote, todos, game }, durations: { focus, short, long } (minutes) }
+//
+// Showing / hiding a box works the same everywhere: the dock buttons ([data-toggle]), the − buttons
+// on each box ([data-hide]) and the switches in this panel all change settings.show.
 import * as storage from "./storage.js";
 
 export const DEFAULT_SETTINGS = {
   city: "Lisbon",
   use24h: true,
-  show: { pomodoro: true, weather: true, quote: true, todos: true },
+  show: { pomodoro: true, weather: true, quote: true, todos: true, game: true },
   durations: { focus: 25, short: 5, long: 15 },
 };
 
@@ -47,6 +50,21 @@ function applyVisibility(show) {
   for (const [key, visible] of Object.entries(show)) {
     document.body.classList.toggle(`hide-${key}`, !visible);
   }
+  document.querySelectorAll("[data-toggle]").forEach((button) => {
+    button.setAttribute("aria-pressed", String(Boolean(show[button.dataset.toggle])));
+    button.title = `${show[button.dataset.toggle] ? "Put away" : "Show"} ${button.textContent.trim().toLowerCase()}`;
+  });
+  // Tell the layout right away, so a box that appears is put in its slot before it is drawn.
+  document.dispatchEvent(new CustomEvent("widgets:visibility"));
+}
+
+// Show or put away one box (used by the dock, the − buttons and e.g. the Pomodoro break link).
+export async function setShown(key, visible) {
+  const s = await getSettings();
+  const next = { ...s, show: { ...s.show, [key]: visible } };
+  await storage.set("settings", next);
+  applyVisibility(next.show);
+  if (!els.panel.hidden) fillForm(); // keep the switches in sync if the panel is open
 }
 
 function clampMinutes(value, fallback) {
@@ -84,6 +102,14 @@ export async function initSettings() {
   applyVisibility((await getSettings()).show);
 
   els.toggle.addEventListener("click", () => setOpen(els.panel.hidden));
+
+  // Dock buttons toggle a box; − buttons put it away.
+  document.addEventListener("click", async (e) => {
+    const toggle = e.target.closest("[data-toggle]");
+    const hide = e.target.closest("[data-hide]");
+    if (toggle) setShown(toggle.dataset.toggle, !(await getSettings()).show[toggle.dataset.toggle]);
+    if (hide) setShown(hide.dataset.hide, false);
+  });
   // "change" fires when a text field loses focus / Enter, and immediately for checkboxes.
   els.form.addEventListener("change", saveFromForm);
   els.form.addEventListener("submit", (e) => { e.preventDefault(); document.activeElement.blur(); });
