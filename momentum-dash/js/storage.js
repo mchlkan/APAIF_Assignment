@@ -13,15 +13,19 @@ export async function get(key, fallback = null) {
   return raw === null ? fallback : JSON.parse(raw);
 }
 
+// Same-tab listeners for the localStorage fallback (chrome.storage notifies the same tab by itself).
+const localListeners = [];
+
 export async function set(key, value) {
   if (chromeStore) {
     await chromeStore.set({ [key]: value });
     return;
   }
   localStorage.setItem(key, JSON.stringify(value));
+  localListeners.filter((l) => l.key === key).forEach((l) => l.callback(value));
 }
 
-// Call `callback(newValue)` whenever `key` changes in another tab.
+// Call `callback(newValue)` whenever `key` changes, in this tab or any other tab.
 export function onChange(key, callback) {
   if (chromeStore) {
     chrome.storage.onChanged.addListener((changes, area) => {
@@ -29,6 +33,7 @@ export function onChange(key, callback) {
     });
     return;
   }
+  localListeners.push({ key, callback });
   window.addEventListener("storage", (event) => {
     if (event.key === key) callback(event.newValue === null ? null : JSON.parse(event.newValue));
   });

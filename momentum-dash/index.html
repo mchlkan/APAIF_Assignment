@@ -13,7 +13,27 @@
   <main class="layout">
     <!-- top-left / top-right slots: filled in later milestones (links, weather) -->
     <header class="top-row">
-      <div id="top-left"></div>
+      <div id="top-left">
+        <!-- Pomodoro timer -->
+        <section id="pomodoro" class="pomodoro panel" aria-label="Pomodoro timer">
+          <div class="pomo-ring">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <circle class="pomo-ring-track" cx="32" cy="32" r="28"></circle>
+              <circle id="pomo-ring-progress" class="pomo-ring-progress" cx="32" cy="32" r="28"></circle>
+            </svg>
+            <span id="pomo-time" class="pomo-time" role="timer">25:00</span>
+          </div>
+          <div class="pomo-side">
+            <span id="pomo-label" class="pomo-label">Focus</span>
+            <span id="pomo-round" class="pomo-round">Round 1 of 4</span>
+            <div class="pomo-controls">
+              <button id="pomo-toggle" class="pill-button" type="button">Start</button>
+              <button id="pomo-reset" class="small-button" type="button" title="Restart this phase" aria-label="Restart this phase">↺</button>
+              <button id="pomo-skip" class="small-button" type="button" title="Skip to next phase" aria-label="Skip to next phase">⏭︎</button>
+            </div>
+          </div>
+        </section>
+      </div>
       <div id="top-right"></div>
     </header>
 
@@ -42,6 +62,7 @@
             <p class="focus-heading">
               <span>Today</span>
               <span id="streak" class="streak" hidden></span>
+              <span id="pomo-count" class="pomo-count" title="Focus rounds completed today" hidden></span>
             </p>
             <div class="focus-row">
               <input id="focus-done" type="checkbox" class="focus-check" aria-label="Mark focus as done">

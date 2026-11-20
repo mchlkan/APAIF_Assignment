@@ -14,6 +14,7 @@ const els = {
   remove: document.getElementById("focus-remove"),
   streak: document.getElementById("streak"),
   praise: document.getElementById("focus-praise"),
+  pomoCount: document.getElementById("pomo-count"),
 };
 
 const PRAISE = ["Nice work.", "Well done.", "Great job.", "That's it for today.", "Focus achieved."];
@@ -72,6 +73,12 @@ async function render() {
   els.streak.hidden = days === 0;
   els.streak.textContent = `${days}-day streak`;
   els.streak.title = `Days in a row you completed your focus. Best: ${streak?.best ?? days} days`;
+
+  // Pomodoro rounds completed today (written by pomodoro.js).
+  const log = await storage.get("pomodoroLog");
+  const rounds = log?.date === storage.todayKey() ? log.count : 0;
+  els.pomoCount.hidden = rounds === 0;
+  els.pomoCount.textContent = `${rounds} pomodoro${rounds === 1 ? "" : "s"}`;
 }
 
 // ---------- events ----------
@@ -106,6 +113,7 @@ function bindEvents() {
   // Keep every open tab in sync.
   storage.onChange("focus", render);
   storage.onChange("streak", render);
+  storage.onChange("pomodoroLog", render);
 }
 
 export async function initFocus() {
