@@ -4,7 +4,7 @@ Nova SBE, Applied Programming & AI Fundamentals. This repository contains three 
 
 | # | Project | What it is | Folder |
 |---|---|---|---|
-| 1 | Momentum Dash replica | A Chrome new-tab dashboard: daily photo, clock, focus, Pomodoro timer, streak, weather, quotes, to-dos | [`momentum-dash/`](momentum-dash/) |
+| 1 | Momentum Dash replica: **Verdant Tab** | Chrome new-tab extension: daily photo, clock, focus of the day, Pomodoro timer, focus streak, weather, quote, to-dos | [`momentum-dash/`](momentum-dash/) |
 | 2 | Books to Scrape | _In progress_ | _tbd_ |
 | 3 | TVmaze API | _In progress_ | _tbd_ |
 
