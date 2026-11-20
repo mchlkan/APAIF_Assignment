@@ -151,6 +151,8 @@ activemq-data/
 
 # Environments
 .env
+.env.*
+!.env.example
 .envrc
 .venv
 env/
@@ -233,6 +235,7 @@ CLAUDE.local.md
 individual-submission.pdf
 
 # Editors, OS files, dependencies, archives
+*.icloud
 .vscode/
 .idea/
 Thumbs.db

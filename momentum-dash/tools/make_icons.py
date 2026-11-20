@@ -4,7 +4,7 @@ Developer tool, standard library only. The design: a dark rounded square with a
 silver ring and a dark-green progress arc (the Pomodoro ring), drawn pixel by pixel
 with 4x4 supersampling for smooth edges.
 
-    python tools/make_icons.py      # from the momentum-dash folder
+    python3 tools/make_icons.py      # from the momentum-dash folder
 """
 
 import math

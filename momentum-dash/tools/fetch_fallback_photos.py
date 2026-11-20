@@ -2,8 +2,8 @@
 
 Developer tool, run once (not needed to use the extension). Standard library only.
 
-    python tools/fetch_fallback_photos.py            # from the momentum-dash folder
-    python tools/fetch_fallback_photos.py --count 5
+    python3 tools/fetch_fallback_photos.py            # from the momentum-dash folder
+    python3 tools/fetch_fallback_photos.py --count 5
 
 The Access Key is read from the UNSPLASH_ACCESS_KEY environment variable, or from
 config.js if that is not set. Writes assets/fallback/fallback-N.jpg + credits.json.

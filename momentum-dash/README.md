@@ -4,6 +4,8 @@ A Chrome extension that replaces the new-tab page with a calm personal dashboard
 
 ![Verdant Tab screenshot](docs/screenshot.jpg)
 
+<sub>Screenshots show a live Unsplash photo by Chris Linnett (credited bottom-left in the page).</sub>
+
 ## Purpose
 
 Inspired by the [Momentum](https://momentumdash.com/) extension: every new tab reminds you what you want to get done today instead of opening on a blank page.
@@ -40,7 +42,13 @@ The extra idea in my version is a small **focus loop**:
 | Quotes | Local file `data/quotes.json` (32 quotes) | Read with `fetch`; quote = day of the year modulo the number of quotes |
 | Name, focus, to-dos, settings | The user | Typed into the page |
 
-The only data that leaves the browser is the **city name** (sent to Open-Meteo) and the Unsplash request (search words + your key). Nothing is sent to any server of mine; there is none.
+What leaves the browser, and to whom:
+
+- **Open-Meteo:** the city name (geocoding), then its latitude and longitude (forecast).
+- **Unsplash:** the search words and your Access Key (`/photos/random`), a `download_location` request (required by Unsplash's guidelines), and the image download from Unsplash's image server.
+- **Every request** also reveals your IP address to that service, like any website visit.
+
+Your name, focus, to-dos and settings never leave the browser. Nothing is sent to a server of mine; there is none.
 
 ## Data persistence
 
@@ -81,7 +89,7 @@ Why `chrome.storage.local` and not a database: the data is small, personal and o
 
 ## Setup
 
-**Requirements:** Google Chrome (or another Chromium browser such as Edge or Brave). No build step and no dependencies: the extension is plain HTML, CSS and JavaScript (ES modules).
+**Requirements:** a current version of Google Chrome (or another Chromium browser such as Edge or Brave; the code uses modern features like `crypto.randomUUID`). No build step and no dependencies: the extension is plain HTML, CSS and JavaScript (ES modules).
 
 1. **Get the code**
    ```bash
@@ -111,6 +119,8 @@ Why `chrome.storage.local` and not a database: the data is small, personal and o
 
 ```
 momentum-dash/
+├── README.md              # this file
+├── AUDIT.md               # pre-publication audit: findings, decisions, fixes
 ├── manifest.json          # Chrome extension config (Manifest V3): overrides the new tab, only "storage" permission
 ├── index.html             # page layout
 ├── styles.css             # design tokens + all styles
@@ -163,7 +173,7 @@ momentum-dash/
   - [Chrome Extensions (Manifest V3)](https://developer.chrome.com/docs/extensions)
   - [Unsplash API documentation](https://unsplash.com/documentation) and [API guidelines](https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines)
   - [Open-Meteo API docs](https://open-meteo.com/en/docs)
-- **Photos:** from Unsplash under the [Unsplash License](https://unsplash.com/license), **not** under this repository's MIT license. Photographers are credited in the page and in `assets/fallback/credits.json`.
+- **Photos:** from Unsplash under the [Unsplash License](https://unsplash.com/license), **not** under this repository's MIT license. Photographers are credited in the page and, for the bundled photos, in `assets/fallback/credits.json`.
 - **Weather data:** [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0).
 - **Inspiration:** [Momentum](https://momentumdash.com/). No code, text or images were copied from it; the name, design and code are my own.
 - **Quotes:** short, attributed quotes, mostly by historical authors; a few are by modern authors and are used as short attributed quotations.

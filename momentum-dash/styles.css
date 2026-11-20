@@ -759,6 +759,7 @@ body.editing [data-widget].resizing { animation: none; outline-color: var(--gree
 body.hide-pomodoro #pomodoro,
 body.hide-weather #weather,
 body.hide-quote #quote,
+body.hide-weather #weather-credit,
 body.hide-todos #todo-panel,
 body.hide-game #game-panel { display: none !important; }
 
@@ -771,6 +772,7 @@ body.hide-game #game-panel { display: none !important; }
   transition: opacity 0.2s;
 }
 .photo-credit:hover { opacity: 1; }
+#weather-credit { margin-top: 2px; }
 .photo-credit a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(167, 176, 181, 0.4); }
 .photo-credit a:hover { color: var(--silver); border-color: var(--green-bright); }
 
