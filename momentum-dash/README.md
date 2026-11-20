@@ -2,7 +2,7 @@
 
 A Chrome extension that replaces the new-tab page with a calm personal dashboard: a daily nature photo, a clock with a personal greeting, your **main focus for the day**, a **Pomodoro timer**, a **focus streak**, the weather, a quote, a to-do list and a quick **tic-tac-toe game** for your breaks. You can **drag every widget** to where you want it. Minimal design in dark, silver and dark green.
 
-![Verdant Tab screenshot](docs/screenshot.png)
+![Verdant Tab screenshot](docs/screenshot.jpg)
 
 ## Purpose
 
@@ -74,6 +74,8 @@ Why `chrome.storage.local` and not a database: the data is small, personal and o
 6. **Tic-tac-toe** (left, under the timer): you are X; choose **Easy** or **Hard**. During a Pomodoro break the timer also offers *"Break time: play a round"*.
 7. **Keep or put away boxes:** hover a box and click **−**, or use the **dock** at the bottom right (*Timer · Weather · To-dos · Game*; a green dot marks the boxes that are shown, To-dos also shows how many items are open).
 8. **Rearrange the page:** press and hold on an empty part of the background (or **⚙︎ Settings → Edit layout**). The boxes jiggle and the empty grid slots appear. Drag a box: a green outline shows where it will land (red = taken); on release it snaps into the slot, or into the nearest free one. To **resize**, pull the corner handle that faces the middle of the screen; a red outline means the size is not allowed (overlap or below the minimum) and the box goes back. **Tidy up** restores the default positions and sizes; **Done** saves.
+
+   ![Edit-layout mode: empty slots, dashed outlines and resize handles](docs/screenshot-edit-mode.jpg)
 9. **⚙︎ Settings** (bottom right): every change is saved immediately. **Escape** or a click outside closes the pop-up panels.
 10. Hover the quote to see the author; click the photo credit to open the photo on Unsplash.
 
@@ -97,13 +99,13 @@ Why `chrome.storage.local` and not a database: the data is small, personal and o
 4. **Open a new tab.** If Chrome asks whether to keep the changed new-tab page, choose **Keep it**.
 5. After changing code, click the **reload** icon on the extension card in `chrome://extensions`.
 
-**Developer tools (optional, Python 3, standard library only):**
+**Developer tools (optional, Python 3.9+, standard library only; on macOS use `python3`):**
 
 | Script | Purpose |
 |---|---|
-| `python tools/fetch_fallback_photos.py` | Re-download the bundled fallback photos (needs `config.js` or an `UNSPLASH_ACCESS_KEY` environment variable) |
-| `python tools/make_icons.py` | Regenerate the extension icons |
-| `python -m http.server 5173` | Preview the page in a normal browser tab at `http://localhost:5173`; the code falls back to `localStorage` when `chrome.storage` is not available |
+| `python3 tools/fetch_fallback_photos.py` | Re-download the bundled fallback photos (needs `config.js` or an `UNSPLASH_ACCESS_KEY` environment variable) |
+| `python3 tools/make_icons.py` | Regenerate the extension icons |
+| `python3 -m http.server 5173` | Preview the page in a normal browser tab at `http://localhost:5173`; the code falls back to `localStorage` when `chrome.storage` is not available |
 
 **Project structure**
 
@@ -130,7 +132,7 @@ momentum-dash/
 ├── assets/fallback/       # 5 bundled photos + credits.json
 ├── icons/                 # 16/48/128 px icons
 ├── tools/                 # developer scripts (not used by the extension at runtime)
-└── docs/screenshot.png
+└── docs/                  # README screenshots
 ```
 
 ## Learning
@@ -161,7 +163,7 @@ momentum-dash/
   - [Chrome Extensions (Manifest V3)](https://developer.chrome.com/docs/extensions)
   - [Unsplash API documentation](https://unsplash.com/documentation) and [API guidelines](https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines)
   - [Open-Meteo API docs](https://open-meteo.com/en/docs)
-- **Photos:** from Unsplash under the [Unsplash License](https://unsplash.com/license). Photographers are credited in the page and in `assets/fallback/credits.json`.
+- **Photos:** from Unsplash under the [Unsplash License](https://unsplash.com/license), **not** under this repository's MIT license. Photographers are credited in the page and in `assets/fallback/credits.json`.
 - **Weather data:** [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0).
 - **Inspiration:** [Momentum](https://momentumdash.com/). No code, text or images were copied from it; the name, design and code are my own.
-- **Quotes:** short, attributed quotes, mostly by historical authors.
+- **Quotes:** short, attributed quotes, mostly by historical authors; a few are by modern authors and are used as short attributed quotations.

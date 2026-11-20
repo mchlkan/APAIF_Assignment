@@ -1,4 +1,4 @@
-// Clock + greeting ("Good evening, Michael") + first-run name prompt.
+// Clock + greeting ("Good evening, <name>") + first-run name prompt.
 import * as storage from "./storage.js";
 import { getSettings } from "./settings.js";
 

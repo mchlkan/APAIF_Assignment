@@ -2,7 +2,7 @@
 // the other widgets react through storage.onChange, in this tab and all other tabs.
 //
 // Stored data:
-//   name     = "Michael"   (separate key, also edited from the greeting)
+//   name     = the user's first name (separate key, also edited from the greeting)
 //   settings = { city, use24h, show: { pomodoro, weather, quote, todos, game }, durations: { focus, short, long } (minutes) }
 //
 // Showing / hiding a box works the same everywhere: the dock buttons ([data-toggle]), the − buttons

@@ -14,7 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -225,13 +225,23 @@ __marimo__/
 # --- Local working docs (assistant + me), not part of the submission ---
 _work/
 CLAUDE.local.md
-.claude/settings.local.json
-.claude/launch.json
+.claude/
 .DS_Store
 .Rhistory
 .RData
 # Course brief (not ours to publish)
 individual-submission.pdf
+
+# Editors, OS files, dependencies, archives
+.vscode/
+.idea/
+Thumbs.db
+node_modules/
+*.zip
+
+# Chrome "Pack extension" output: the .pem is a private signing key, never publish it
+*.pem
+*.crx
 
 # Momentum Dash: real Unsplash key lives here (copy from config.example.js)
 momentum-dash/config.js
