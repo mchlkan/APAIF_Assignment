@@ -197,7 +197,16 @@ def low_stock(df: pd.DataFrame, n: int = 6) -> pd.DataFrame:
 
 def takeaways(df: pd.DataFrame, min_books: int = 10) -> dict:
     """The numbers behind the written findings on the Insights tab (None where undefined)."""
-    result = {"cheapest_category": None, "priciest_category": None, "rating_gap": None}
+    result = {
+        "cheapest_category": None, "priciest_category": None, "rating_gap": None,
+        "top_rating": None, "busiest_band": None,
+    }
+    if df.empty:
+        return result
+    ratings = rating_distribution(df)
+    result["top_rating"] = {"stars": int(ratings.idxmax()), "share": float(ratings.max() / len(df) * 100)}
+    bands = price_distribution(df, 5)
+    result["busiest_band"] = {"band": bands.idxmax(), "books": int(bands.max())}
     prices = category_prices(df, min_books)
     if not prices.empty:
         result["cheapest_category"] = prices.iloc[0].to_dict()

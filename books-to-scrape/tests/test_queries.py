@@ -151,6 +151,8 @@ def test_takeaways(books):
     gap = result["rating_gap"]
     assert gap["low_rating"] == 1 and gap["high_rating"] == 5
     assert gap["difference"] == pytest.approx(gap["high_price"] - gap["low_price"])
+    assert result["top_rating"]["stars"] == books["rating"].mode().iloc[0]
+    assert result["busiest_band"]["books"] == queries.price_distribution(books, 5).max()
     empty = queries.takeaways(books.iloc[0:0])
     assert empty["cheapest_category"] is None and empty["rating_gap"] is None
 
