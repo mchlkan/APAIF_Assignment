@@ -72,13 +72,41 @@ def show_detail(results: pd.DataFrame) -> None:
     info.link_button("Open book page", book["product_url"])
 
 
+def bar_chart(series: pd.Series, x_label: str, y_label: str) -> None:
+    """Bar chart that keeps the order of the series (Streamlit would sort labels A-Z)."""
+    frame = series.rename_axis(x_label).reset_index(name=y_label)
+    st.bar_chart(frame, x=x_label, y=y_label, sort=False)
+
+
+def show_insights(books: pd.DataFrame) -> None:
+    """Overview of the whole catalogue (deliberately ignores the sidebar filters)."""
+    numbers = queries.kpis(books)
+    tiles = st.columns(4)
+    tiles[0].metric("Books", numbers["books"])
+    tiles[1].metric("Categories", numbers["categories"])
+    tiles[2].metric("Average price", f"£{numbers['avg_price']:.2f}")
+    tiles[3].metric("In stock", f"{numbers['pct_in_stock']:.0f}%")
+
+    left, right = st.columns(2)
+    with left:
+        st.subheader("Books per category (top 15)")
+        bar_chart(queries.books_per_category(books), "Category", "Books")
+        st.subheader("Average price by rating")
+        bar_chart(queries.avg_price_by_rating(books), "Rating (stars)", "Average price (£)")
+    with right:
+        st.subheader("Price distribution (£10 bands)")
+        bar_chart(queries.price_distribution(books), "Price band (£)", "Books")
+
+
 source = queries.default_source()
 books = get_books(source)
 
 st.title("📚 Books to Scrape")
 results = sidebar_filters(books)
-browse_tab, detail_tab = st.tabs(["Browse", "Book detail"])
+browse_tab, detail_tab, insights_tab = st.tabs(["Browse", "Book detail", "Insights"])
 with browse_tab:
     show_browse(results, len(books))
 with detail_tab:
     show_detail(results)
+with insights_tab:
+    show_insights(books)
