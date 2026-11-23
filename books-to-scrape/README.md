@@ -66,20 +66,22 @@ BOOKS_SOURCE=sample conda run -n apaif streamlit run app.py   # no database need
 icon), so anyone can try the interface without a Supabase project. The app only ever uses the read-only publishable key.
 
 The app looks like a small bookshop: a warm paper theme with a deep green accent and serif headings, set only in
-`.streamlit/config.toml` (no custom CSS). Under the title, five tiles show books, categories, median price, copies in
-stock and the share of 5-star books. Below are two tabs, plus a sidebar:
+`.streamlit/config.toml` (no custom CSS). Under the title, four tiles show books, median price, copies in stock and the
+share of 5-star books. A switch below them chooses between two views, next to a **Surprise me** button that opens a
+random book from the current selection:
 
-- **Sidebar filters** (apply to the Shelf tab): title search, categories, price range, minimum rating (star pills) and a
-  sort order. There is no "in stock only" filter: every scraped book is in stock, so it would change nothing.
+- **Sidebar filters** (apply to the Shelf view): title search, categories, price range, minimum stars (Any, 2+ ... 5) and
+  a sort order. There is no "in stock only" filter: every scraped book is in stock, so it would change nothing.
 - **Shelf**: the matching books as a grid of cards (cover, title, rating, price, category), 24 per page with a page
-  control. "x of y books" shows how many match. **Details** opens a dialog with the bigger cover, full description,
+  control. Every card is built from fixed-height zones, so covers, titles and buttons line up across a row.
+  "x of y books" shows how many match. **Details** opens a dialog with the bigger cover, full description,
   prices with and without tax, copies available and a link to the book's page on the source site. A Grid/Table switch
   falls back to a plain table.
 - **Insights** (the extra feature): short written findings computed from the data, each with a chart: the rating
   distribution, price bands of £5, whether rating drives price, and the average price per category (categories with at
-  least 10 books; cheapest and priciest called out). Two shelves show the cheapest 5-star books and the books with the
-  fewest copies left. A caption explains that "Default" and "Add a comment" are the site's own placeholder categories.
-  These always describe the whole catalogue, not the filtered selection.
+  least 10 books; the cheapest and priciest are coloured, the site's placeholder categories greyed). Two shelves show
+  the cheapest 5-star books and the books with the most copies in stock. These always describe the whole catalogue,
+  not the filtered selection.
 - **Footer**: the data source and, for Supabase, the date and mode of the latest scrape run.
 
 Messages instead of crashes: missing or wrong keys (with the hint to use sample mode), an unreachable database, an
