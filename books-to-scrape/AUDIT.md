@@ -36,7 +36,7 @@ Caches, `.env` and Streamlit's `secrets.toml` are ignored, and the sample data i
 | 1.1 | README links `AUDIT.md`, which didn't exist yet | Confirmed | **Fixed** | This file |
 | 1.2 | README "Learning" section is still a placeholder | Confirmed | **Open (planned)** | I write it myself, in my own words, before submitting |
 | 1.3 | The clone URL shows the repository is public under my GitHub handle | Note | **No change** | Intended: the repository is public for the submission |
-| 1.4 | README says the secret key is never uploaded to Streamlit Cloud; not verifiable from the files | Possible | **To confirm** | I set the deployment's secrets to the URL and the publishable key only; to be double-checked in the Streamlit Cloud settings before submitting |
+| 1.4 | README says the secret key is never uploaded to Streamlit Cloud; not verifiable from the files | Possible | **Verified by me** | Checked in Streamlit Cloud (app settings → Secrets): only the URL and the publishable key are stored, no secret key |
 | 1.5 | README says the app's key can only read (Row Level Security); only `schema.sql` was read | Possible | **Already verified** | Tested against the live project on 23 Nov: an insert with the publishable key was rejected (`permission denied`), the secret key could write |
 | 1.6 | Live demo URL not checked | Possible | **Already verified** | Opened it: all 1,000 books load and the theme is applied |
 | 1.7 | Pinned package versions not checked | Possible | **Already verified** | Installed from `requirements.txt` in a clean conda environment; `pip install --dry-run -r requirements.txt` resolves |
@@ -57,7 +57,7 @@ screenshots show only the app. Remaining points:
 | # | Finding | Type | Decision | What I did |
 |---|---|---|---|---|
 | 2-1 | README "Learning" is still a placeholder | Confirmed | **Open (planned)** | Same as 1.2: written by me before submitting |
-| 2-2 | Finding 1.4 (Streamlit secrets) still "to confirm" | Confirmed | **Open** | I check the app's secrets in Streamlit Cloud and update 1.4 |
+| 2-2 | Finding 1.4 (Streamlit secrets) still "to confirm" | Confirmed | **Fixed** | Checked the app's secrets in Streamlit Cloud after the run: no secret key; 1.4 updated |
 | 2-3 | Some commits in the history carry a personal email address and a student number | Possible | **Documented** | These are commits from project 1, documented in [`../momentum-dash/AUDIT.md`](../momentum-dash/AUDIT.md); all commits of this project use the GitHub noreply address |
 | 2-4 | The worktree branches of the two coding agents exist only locally, not on GitHub | Possible | **No change** | Their commits are in `main` through the two merge commits (`ffc0f4f`, `bde1d18`), so the parallel build stays visible in the history |
 | 2-5 | Python 3.12 is only stated in the README (no `runtime.txt` / `.python-version`) | Recommendation | **No change** | Streamlit Cloud takes the version from its settings, which the README documents |
