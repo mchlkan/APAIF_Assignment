@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 
 import queries
+from db import ConfigError
 
 st.set_page_config(page_title="Books to Scrape", page_icon="📚", layout="wide")
 
@@ -30,6 +31,9 @@ def sidebar_filters(books: pd.DataFrame) -> pd.DataFrame:
 
 def show_browse(results: pd.DataFrame, total: int) -> None:
     st.caption(f"{len(results)} of {total} books")
+    if results.empty:
+        st.info("No book matches the filters. Try loosening them in the sidebar.")
+        return
     st.dataframe(
         results[["image_url", "title", "category", "price", "rating", "in_stock", "product_url"]],
         hide_index=True,
@@ -98,8 +102,38 @@ def show_insights(books: pd.DataFrame) -> None:
         bar_chart(queries.price_distribution(books), "Price band (£)", "Books")
 
 
-source = queries.default_source()
-books = get_books(source)
+def load_or_stop() -> tuple[str, pd.DataFrame]:
+    """Load the books, or show a clear message and stop the script (instead of a traceback)."""
+    try:
+        source = queries.default_source()
+        books = get_books(source)
+    except (ValueError, ConfigError) as error:
+        st.error(f"{error}")
+        st.info("To try the app without a database, start it with `BOOKS_SOURCE=sample`.")
+        st.stop()
+    except Exception as error:  # network down, wrong key, table missing ...
+        st.error(f"Could not read the books from Supabase ({type(error).__name__}).")
+        st.info("Check your internet connection and the values in `.env`, or use `BOOKS_SOURCE=sample`.")
+        st.stop()
+    if books.empty:
+        st.warning("The database has no books yet. Run `python scraper.py` first, or use `BOOKS_SOURCE=sample`.")
+        st.stop()
+    return source, books
+
+
+def show_footer(source: str) -> None:
+    st.divider()
+    text = f"Data source: {source}" + (" (synthetic sample data)" if source == "sample" else "")
+    try:
+        run = queries.latest_run(source)
+    except Exception:  # the footer is optional, never let it break the page
+        run = None
+    if run:
+        text += f" · latest scrape: {str(run['started_at'])[:16].replace('T', ' ')} UTC, {run['mode']}, {run['status']}"
+    st.caption(text)
+
+
+source, books = load_or_stop()
 
 st.title("📚 Books to Scrape")
 results = sidebar_filters(books)
@@ -110,3 +144,5 @@ with detail_tab:
     show_detail(results)
 with insights_tab:
     show_insights(books)
+
+show_footer(source)
