@@ -158,17 +158,93 @@ def show_shelf(results: pd.DataFrame, total: int) -> None:
 
 # --- insights ------------------------------------------------------------------------------
 
-def bar_chart(series: pd.Series, x_label: str, y_label: str) -> None:
-    """Bar chart that keeps the order of the series (Streamlit would sort labels A-Z)."""
-    frame = series.rename_axis(x_label).reset_index(name=y_label)
-    st.bar_chart(frame, x=x_label, y=y_label, sort=False, alt=f"{y_label} by {x_label.lower()}")
+def insight_card(title: str, icon: str, takeaway: str):
+    """A bordered card with a heading and a one-sentence takeaway; the caller adds the chart."""
+    box = st.container(border=True)
+    with box:
+        st.subheader(title, icon=icon)
+        st.markdown(takeaway)
+    return box
+
+
+def show_mini_shelf(books: pd.DataFrame, detail) -> None:
+    """A row of small cover cards. `detail(book)` gives the second line of text under each."""
+    with st.grid(6, min_column_width=130):
+        for _, book in books.iterrows():
+            with st.container(border=True, height="stretch"):
+                show_cover(book["image_url"], book["title"])
+                st.caption(f"**{shorten(book['title'], 32)}**")
+                st.caption(detail(book))
 
 
 def show_insights(books: pd.DataFrame) -> None:
-    """Overview of the whole catalogue (deliberately ignores the sidebar filters)."""
-    bar_chart(queries.books_per_category(books), "Category", "Books")
-    bar_chart(queries.avg_price_by_rating(books), "Rating (stars)", "Average price (£)")
-    bar_chart(queries.price_distribution(books), "Price band (£)", "Books")
+    """Findings about the whole catalogue (deliberately ignores the sidebar filters)."""
+    st.caption("These findings describe the whole catalogue, not the filtered selection in the sidebar.")
+    # The sample has only 60 books, so no category reaches 10; use a lower bar there.
+    min_books = 10 if len(books) >= 200 else 5
+    found = queries.takeaways(books, min_books)
+
+    left, right = st.columns(2)
+    with left:
+        top = found["top_rating"]
+        with insight_card(
+            "How readers rate the books", ":material/star:",
+            f"**{top['stars']}★ is the most common rating** ({top['share']:.0f}% of books).",
+        ):
+            ratings = queries.rating_distribution(books).rename_axis("Stars").reset_index(name="Books")
+            st.bar_chart(ratings, x="Stars", y="Books", height=240, alt="Number of books per star rating")
+    with right:
+        band = found["busiest_band"]
+        with insight_card(
+            "What books cost", ":material/payments:",
+            f"**The busiest price band is £{band['band']}** with {band['books']} books.",
+        ):
+            bands = queries.price_distribution(books, 5).rename_axis("Price band (£)").reset_index(name="Books")
+            st.bar_chart(bands, x="Price band (£)", y="Books", sort=False, height=240, alt="Number of books per £5 price band")
+
+    left, right = st.columns(2)
+    with left:
+        gap = found["rating_gap"]
+        if gap:
+            facts = (
+                f"{gap['low_rating']}★ books cost £{gap['low_price']:.2f} on average, "
+                f"{gap['high_rating']}★ books £{gap['high_price']:.2f}."
+            )
+            # Say "no link" only when the gap is small (under 10% of the low price); otherwise report the gap.
+            if abs(gap["difference"]) < 0.10 * gap["low_price"]:
+                text = f"**Rating doesn't drive price.** {facts}"
+            else:
+                direction = "more" if gap["difference"] > 0 else "less"
+                text = f"**Better-rated books cost {direction}.** {facts}"
+            with insight_card("Does quality cost more?", ":material/balance:", text):
+                by_rating = queries.avg_price_by_rating(books).rename_axis("Stars").reset_index(name="Average price (£)")
+                st.bar_chart(by_rating, x="Stars", y="Average price (£)", height=240, alt="Average price per star rating")
+
+    with right:
+        cheapest, priciest = found["cheapest_category"], found["priciest_category"]
+        if cheapest and priciest:
+            text = (
+                f"**{cheapest['category']} is the cheapest category** (£{cheapest['avg_price']:.2f} on average) and "
+                f"**{priciest['category']} the priciest** (£{priciest['avg_price']:.2f}). "
+                f"Only categories with at least {min_books} books are shown."
+            )
+            with insight_card("Price by category", ":material/category:", text):
+                prices = queries.category_prices(books, min_books)
+                st.bar_chart(
+                    prices, x="category", y="avg_price", horizontal=True, sort="avg_price",
+                    x_label="Category", y_label="Average price (£)",
+                    alt=f"Average price per category: cheapest {cheapest['category']}, priciest {priciest['category']}",
+                )
+    if books["category"].isin(queries.PLACEHOLDER_CATEGORIES).any():
+        st.caption(
+            "\"Default\" and \"Add a comment\" are the source site's own placeholder categories, "
+            "not real genres, so read them with care."
+        )
+
+    st.subheader("Best value: cheapest 5-star books", icon=":material/savings:")
+    show_mini_shelf(queries.best_value(books), lambda b: f"£{b['price']:.2f} · 5★")
+    st.subheader("Almost gone: lowest stock", icon=":material/hourglass_bottom:")
+    show_mini_shelf(queries.low_stock(books), lambda b: f"{int(b['stock_count'])} left · £{b['price']:.2f}")
 
 
 def load_or_stop() -> tuple[str, pd.DataFrame]:
