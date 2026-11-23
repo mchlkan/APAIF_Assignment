@@ -1,13 +1,24 @@
 # Books to Scrape
 
-> Work in progress: this README is filled in section by section during the build (see [docs/plan.md](docs/plan.md)).
-
 Scrapes all 1,000 books from [books.toscrape.com](https://books.toscrape.com), a sandbox site made for
 scraping practice, stores them in a Supabase (Postgres) database, and lets you browse, filter and
 analyse them in a Streamlit app.
 
+**Live demo:** <https://ap-books-to-scrape.streamlit.app/> (Streamlit Community Cloud, free tier: if it has been idle,
+click "wake up" and wait ~30 s; if the free Supabase project has been paused for inactivity, the app shows a
+"could not read the books" message, so run it locally in [sample mode](#setup) instead).
+
+![Shelf view: book cards with covers, ratings and prices, filters in the sidebar](docs/screenshot-shelf.jpg)
+
 ## Purpose
-_To do (docs task)._
+Project 2 of the course assignment: collect data from a website, store it in a database and present it through an
+interface. The goal was a small but complete pipeline that someone else can rerun:
+
+1. **Scrape** every book (title, price, rating, stock, category, description, cover) politely and repeatably.
+2. **Store** it in a real cloud database with sensible tables and access rules, so the reading app can never change
+   the data.
+3. **Explore** it in a web app that feels like a small bookshop: browse covers, filter, open a book, and read a few
+   honest findings about the catalogue.
 
 ## Data collection
 `scraper.py` crawls [books.toscrape.com](https://books.toscrape.com) with `requests` and parses the pages with
@@ -28,9 +39,10 @@ BeautifulSoup (`parse.py`, pure functions that are tested on saved HTML pages).
 - Not stored: "Number of reviews" (always 0 on this site).
 
 ```bash
-conda run -n apaif python scraper.py --limit 40   # test run
-conda run -n apaif python scraper.py              # incremental
-conda run -n apaif python scraper.py --full       # update everything
+# from inside books-to-scrape/, with the environment active (see Setup)
+python scraper.py --limit 40   # test run
+python scraper.py              # incremental
+python scraper.py --full       # update everything
 ```
 
 ## Data persistence
@@ -58,8 +70,8 @@ where it is started. It needs the Supabase keys in `.env`, or sample mode:
 
 ```bash
 cd books-to-scrape
-conda run -n apaif streamlit run app.py
-BOOKS_SOURCE=sample conda run -n apaif streamlit run app.py   # no database needed
+streamlit run app.py                        # real data from Supabase
+BOOKS_SOURCE=sample streamlit run app.py    # no database needed
 ```
 
 `BOOKS_SOURCE=sample` shows 60 synthetic books from `tests/fixtures/sample_books.csv` (no covers, so cards show a book
@@ -92,14 +104,97 @@ request; the category name is joined in) and holds the filter and aggregate func
 `tests/test_queries.py` checks offline. `app.py` only draws the interface (small functions: header, filters, cards, dialog, insights) and caches the loaded data for 10 minutes.
 
 ## Setup
-_To do (docs task): fresh clone → conda env → `pip install -r requirements.txt` → Supabase project +
-`schema.sql` → `.env` → scrape → run the app. Sample mode without Supabase._
+Needs Python 3.12 and, for real data, a free [Supabase](https://supabase.com) account.
+
+**1. Get the code and install the packages**
+
+```bash
+git clone https://github.com/mchlkan/APAIF_Assignment.git
+cd APAIF_Assignment/books-to-scrape
+conda create -n apaif python=3.12   # or any Python 3.12 virtual environment
+conda activate apaif
+pip install -r requirements.txt
+```
+
+**2a. Quick look without a database (sample mode)**
+
+```bash
+BOOKS_SOURCE=sample streamlit run app.py
+```
+
+This shows 60 synthetic books; everything works except real covers and the scrape-run footer.
+
+**2b. Full setup with your own Supabase project**
+
+1. In Supabase, create a project (any name, a strong database password; the code never needs that password).
+2. Open **SQL Editor → New query**, paste the contents of [`schema.sql`](schema.sql) and click **Run**. It creates the
+   three tables, the read-only policy and the grants, and is safe to run again.
+3. Copy `.env.example` to `.env` (same folder) and fill in the values from **Project Settings → API keys** (and
+   **Data API** for the URL): `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY`. The legacy
+   `anon` / `service_role` keys work too. `.env` is gitignored; never commit it.
+4. Scrape (a full run is ~1,050 requests and takes a few minutes), then start the app:
+
+```bash
+python scraper.py --limit 40   # optional quick test
+python scraper.py              # all 1,000 books
+streamlit run app.py           # opens http://localhost:8501
+```
+
+Start the app from inside `books-to-scrape/` so Streamlit finds the theme in `.streamlit/config.toml`. If you use
+`conda run` instead of an activated environment, add `--no-capture-output`, otherwise Streamlit's "You can now view
+your app" line (and the scraper's progress) is held back until the program ends.
+
+**Tests** (offline: saved HTML pages, a fake database client and the sample CSV; they never touch the network):
+
+```bash
+python -m pytest -q
+```
+
+**Deploying** (how the live demo runs): Streamlit Community Cloud → Create app → this repository, branch `main`, main
+file `books-to-scrape/app.py`, Python 3.12. In *Advanced settings → Secrets* add only `SUPABASE_URL` and
+`SUPABASE_PUBLISHABLE_KEY` (Streamlit passes them to the app as environment variables). The secret key is never
+uploaded: the app only reads.
 
 ## Learning
-_To do: written by Michael at the end._
+_To be written by Michael in his own words._
 
 ## Limitations and assistance
-_To do (docs task): known limitations, AI tools used (including the multi-agent build setup)._
+**Limitations**
+- **The data is artificial.** books.toscrape.com is a practice site: every book is in stock, prices are spread evenly
+  between £10 and £60, ratings barely relate to price, "Number of reviews" is always 0 (not stored), and two of the
+  biggest "categories" ("Default", "Add a comment") are placeholders of the site. The Insights tab says so instead of
+  presenting these numbers as real market facts.
+- **Free hosting.** Supabase pauses free projects after about a week without activity, and Streamlit puts idle apps to
+  sleep. The live demo can therefore be unavailable for a moment; the local setup and sample mode always work.
+- **Snapshot, not history.** An incremental run only adds new books; `--full` updates rows in place. Price changes over
+  time are not tracked (the site's prices never change anyway).
+- **Sample mode** has no cover images and no scrape-run information.
+- **Not tested end to end in CI.** The tests cover parsing, database helpers (with a fake client) and the data
+  functions; the scraper against the live site and the app were checked by hand and with Streamlit's testing tools.
 
-## Screenshot
-_To do._
+**Assistance**
+- **AI tools:** built with Claude Code (Anthropic). This was my first time building a project with several AI agents
+  working at the same time. The setup:
+  - **Planning:** I worked out the plan with Claude (model Claude Opus 5.5): stack, database schema, which agent owns
+    which files, and the checkpoints where I review. The plan is in [`docs/plan.md`](docs/plan.md) and was the brief
+    the coding agents worked from.
+  - **Foundation:** written in the planning session (schema, database client, sample data, first tests), after I set up
+    the Supabase project myself.
+  - **Parallel build:** two coding agents (Claude Sonnet 5.5), each in its own Git worktree and branch, at the same time:
+    one built the scraper and database writes, the other the Streamlit app against the sample data. Fixed file
+    ownership meant they never edited the same file, and both branches merged without conflicts.
+  - **Checks:** a small read-only "checker" agent (Claude Haiku) ran the tests, a short scrape and the app after the
+    merge; an independent read-only "auditor" agent ran the course audit (see [`AUDIT.md`](AUDIT.md)).
+  - **Redesign:** after I tried the app, I asked for a more interesting design. A coding agent (Sonnet) rebuilt the
+    interface in two rounds of my feedback, using Streamlit's official `developing-with-streamlit` agent skill.
+  - Agents committed their own work in small steps (each commit is marked `Co-Authored-By: Claude`); I reviewed at the
+    checkpoints, tested the app, set up Supabase and the deployment, and pushed.
+- **Libraries:** requests, Beautiful Soup, supabase-py, python-dotenv, pandas, Streamlit (with Altair, which ships with
+  it), pytest. No code was copied from tutorials.
+- **Data and images:** book data and cover images belong to books.toscrape.com, a public sandbox built for scraping
+  practice; covers are loaded from that site, not stored here.
+
+## Screenshots
+Shelf view (above). Insights view:
+
+![Insights view: findings on ratings, prices and quality vs price, and average price per category](docs/screenshot-insights.jpg)
