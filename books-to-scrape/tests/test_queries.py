@@ -67,9 +67,11 @@ def test_kpis(books):
     result = queries.kpis(books)
     assert result["books"] == 60
     assert result["categories"] == books["category"].nunique()
-    assert result["avg_price"] == pytest.approx(books["price"].mean())
-    assert 0 <= result["pct_in_stock"] <= 100
-    assert queries.kpis(books.iloc[0:0])["books"] == 0
+    assert result["median_price"] == pytest.approx(books["price"].median())
+    assert result["copies"] == books["stock_count"].sum()
+    assert result["pct_five_star"] == pytest.approx((books["rating"] == 5).mean() * 100)
+    empty = queries.kpis(books.iloc[0:0])
+    assert empty["books"] == 0 and empty["copies"] == 0
 
 
 def test_books_per_category(books):
@@ -79,17 +81,78 @@ def test_books_per_category(books):
     assert counts.sum() <= len(books)
 
 
+def test_page_count_and_paginate(books):
+    assert queries.page_count(0, 24) == 1
+    assert queries.page_count(24, 24) == 1
+    assert queries.page_count(25, 24) == 2
+    first, last = queries.paginate(books, 1, 24), queries.paginate(books, 3, 24)
+    assert len(first) == 24 and len(last) == 12
+    assert first["upc"].iloc[0] == books["upc"].iloc[0]
+    assert queries.paginate(books, 99, 24).equals(last)  # clamped to the last page
+    assert queries.paginate(books, 0, 24).equals(first)  # clamped to the first page
+    assert queries.paginate(books.iloc[0:0], 1, 24).empty
+
+
+def test_rating_distribution_has_all_stars(books):
+    result = queries.rating_distribution(books)
+    assert list(result.index) == [1, 2, 3, 4, 5]
+    assert result.sum() == len(books)
+    only_threes = books[books["rating"] == 3]
+    assert queries.rating_distribution(only_threes)[[1, 2, 4, 5]].eq(0).all()
+
+
+def test_category_prices_threshold_and_order(books):
+    result = queries.category_prices(books, min_books=8)
+    assert set(result.columns) == {"category", "books", "avg_price"}
+    assert (result["books"] >= 8).all()
+    assert result["avg_price"].is_monotonic_increasing
+    expected = books[books["category"] == result["category"].iloc[0]]["price"].mean()
+    assert result["avg_price"].iloc[0] == pytest.approx(expected, abs=0.01)
+    assert queries.category_prices(books, min_books=1000).empty
+
+
 def test_price_distribution_counts_every_book(books):
     distribution = queries.price_distribution(books)
     assert distribution.sum() == len(books)
     assert all("-" in label for label in distribution.index)
     assert queries.price_distribution(books.iloc[0:0]).empty
+    five = queries.price_distribution(books, bin_width=5)
+    assert five.sum() == len(books)
+    assert len(five) > len(distribution)  # narrower bands, more of them
 
 
 def test_avg_price_by_rating(books):
     result = queries.avg_price_by_rating(books)
     assert set(result.index) <= {1, 2, 3, 4, 5}
     assert result.between(books["price"].min(), books["price"].max()).all()
+
+
+def test_best_value_is_cheapest_five_star(books):
+    result = queries.best_value(books, n=3)
+    assert len(result) == 3
+    assert (result["rating"] == 5).all()
+    assert result["price"].is_monotonic_increasing
+    assert result["price"].iloc[0] == books[books["rating"] == 5]["price"].min()
+
+
+def test_low_stock_is_fewest_copies_but_available(books):
+    result = queries.low_stock(books, n=4)
+    assert len(result) == 4
+    assert result["in_stock"].all() and (result["stock_count"] > 0).all()
+    assert result["stock_count"].is_monotonic_increasing
+    available = books[books["in_stock"] & (books["stock_count"] > 0)]
+    assert result["stock_count"].iloc[0] == available["stock_count"].min()
+
+
+def test_takeaways(books):
+    result = queries.takeaways(books, min_books=8)
+    cheapest, priciest = result["cheapest_category"], result["priciest_category"]
+    assert cheapest["avg_price"] <= priciest["avg_price"]
+    gap = result["rating_gap"]
+    assert gap["low_rating"] == 1 and gap["high_rating"] == 5
+    assert gap["difference"] == pytest.approx(gap["high_price"] - gap["low_price"])
+    empty = queries.takeaways(books.iloc[0:0])
+    assert empty["cheapest_category"] is None and empty["rating_gap"] is None
 
 
 def test_latest_run_sample_is_none():

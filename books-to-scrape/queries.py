@@ -18,6 +18,9 @@ COLUMNS = [
     "rating", "description", "image_url", "product_url", "first_seen", "last_scraped",
 ]
 
+# The site itself files these books under placeholder categories (not real genres).
+PLACEHOLDER_CATEGORIES = ("Default", "Add a comment")
+
 SORT_OPTIONS = {
     "Title (A to Z)": ("title", True),
     "Price (low to high)": ("price", True),
@@ -113,23 +116,54 @@ def filter_books(
     return df[mask].sort_values([column, "title"], ascending=[ascending, True]).reset_index(drop=True)
 
 
-# --- aggregates for the Insights tab -----------------------------------------------------
+# --- shelf view --------------------------------------------------------------------------
+
+def page_count(total: int, per_page: int) -> int:
+    """Number of pages needed for `total` items (at least 1, so an empty shelf has a page 1)."""
+    return max(1, -(-total // per_page))  # -(-a // b) is a ceiling division
+
+
+def paginate(df: pd.DataFrame, page: int, per_page: int) -> pd.DataFrame:
+    """The rows of one page (page numbers start at 1; out-of-range pages are clamped)."""
+    page = min(max(page, 1), page_count(len(df), per_page))
+    start = (page - 1) * per_page
+    return df.iloc[start : start + per_page]
+
+
+# --- aggregates for the header and the Insights tab --------------------------------------
 
 def kpis(df: pd.DataFrame) -> dict:
-    """The four headline numbers. An empty DataFrame gives zeros instead of NaN."""
+    """The headline numbers. An empty DataFrame gives zeros instead of NaN."""
     if df.empty:
-        return {"books": 0, "categories": 0, "avg_price": 0.0, "pct_in_stock": 0.0}
+        return {"books": 0, "categories": 0, "median_price": 0.0, "copies": 0, "pct_five_star": 0.0}
     return {
         "books": len(df),
         "categories": df["category"].nunique(),
-        "avg_price": float(df["price"].mean()),
-        "pct_in_stock": float(df["in_stock"].mean() * 100),
+        "median_price": float(df["price"].median()),  # median: robust, prices are spread evenly
+        "copies": int(df["stock_count"].sum()),  # copies on the shelves, not titles
+        "pct_five_star": float((df["rating"] == 5).mean() * 100),
     }
 
 
 def books_per_category(df: pd.DataFrame, top: int = 15) -> pd.Series:
     """Number of books in the `top` largest categories (index = category, sorted descending)."""
     return df["category"].value_counts().head(top)
+
+
+def rating_distribution(df: pd.DataFrame) -> pd.Series:
+    """Books per star rating; all of 1..5 are present, with 0 for stars nobody got."""
+    return df["rating"].value_counts().reindex(range(1, 6), fill_value=0)
+
+
+def category_prices(df: pd.DataFrame, min_books: int = 10) -> pd.DataFrame:
+    """Average price per category (columns category, books, avg_price), cheapest first.
+
+    Only categories with at least `min_books` books: an average of two books says little.
+    """
+    grouped = df.groupby("category")["price"].agg(books="count", avg_price="mean").reset_index()
+    grouped = grouped[grouped["books"] >= min_books]
+    grouped["avg_price"] = grouped["avg_price"].round(2)
+    return grouped.sort_values(["avg_price", "category"]).reset_index(drop=True)
 
 
 def price_distribution(df: pd.DataFrame, bin_width: int = 10) -> pd.Series:
@@ -148,3 +182,32 @@ def price_distribution(df: pd.DataFrame, bin_width: int = 10) -> pd.Series:
 def avg_price_by_rating(df: pd.DataFrame) -> pd.Series:
     """Average price for each star rating (index = rating 1..5)."""
     return df.groupby("rating")["price"].mean().round(2)
+
+
+def best_value(df: pd.DataFrame, n: int = 6) -> pd.DataFrame:
+    """The `n` cheapest 5-star books (ties broken by title so the order is stable)."""
+    return df[df["rating"] == 5].sort_values(["price", "title"]).head(n).reset_index(drop=True)
+
+
+def low_stock(df: pd.DataFrame, n: int = 6) -> pd.DataFrame:
+    """The `n` books with the fewest copies left (only books that are still in stock)."""
+    available = df[df["in_stock"] & (df["stock_count"] > 0)]
+    return available.sort_values(["stock_count", "title"]).head(n).reset_index(drop=True)
+
+
+def takeaways(df: pd.DataFrame, min_books: int = 10) -> dict:
+    """The numbers behind the written findings on the Insights tab (None where undefined)."""
+    result = {"cheapest_category": None, "priciest_category": None, "rating_gap": None}
+    prices = category_prices(df, min_books)
+    if not prices.empty:
+        result["cheapest_category"] = prices.iloc[0].to_dict()
+        result["priciest_category"] = prices.iloc[-1].to_dict()
+    by_rating = avg_price_by_rating(df)
+    if len(by_rating) >= 2:
+        low, high = by_rating.index.min(), by_rating.index.max()
+        result["rating_gap"] = {
+            "low_rating": int(low), "low_price": float(by_rating[low]),
+            "high_rating": int(high), "high_price": float(by_rating[high]),
+            "difference": float(by_rating[high] - by_rating[low]),
+        }
+    return result
