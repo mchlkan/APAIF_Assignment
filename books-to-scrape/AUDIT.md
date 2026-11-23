@@ -36,7 +36,7 @@ Caches, `.env` and Streamlit's `secrets.toml` are ignored, and the sample data i
 | 1.1 | README links `AUDIT.md`, which didn't exist yet | Confirmed | **Fixed** | This file |
 | 1.2 | README "Learning" section is still a placeholder | Confirmed | **Open (planned)** | I write it myself, in my own words, before submitting |
 | 1.3 | The clone URL shows the repository is public under my GitHub handle | Note | **No change** | Intended: the repository is public for the submission |
-| 1.4 | README says the secret key is never uploaded to Streamlit Cloud; not verifiable from the files | Possible | **Verified by me** | The deployment's secrets contain only the URL and the publishable key |
+| 1.4 | README says the secret key is never uploaded to Streamlit Cloud; not verifiable from the files | Possible | **To confirm** | I set the deployment's secrets to the URL and the publishable key only; to be double-checked in the Streamlit Cloud settings before submitting |
 | 1.5 | README says the app's key can only read (Row Level Security); only `schema.sql` was read | Possible | **Already verified** | Tested against the live project on 23 Nov: an insert with the publishable key was rejected (`permission denied`), the secret key could write |
 | 1.6 | Live demo URL not checked | Possible | **Already verified** | Opened it: all 1,000 books load and the theme is applied |
 | 1.7 | Pinned package versions not checked | Possible | **Already verified** | Installed from `requirements.txt` in a clean conda environment; `pip install --dry-run -r requirements.txt` resolves |
