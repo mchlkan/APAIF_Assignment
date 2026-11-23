@@ -45,9 +45,26 @@ Caches, `.env` and Streamlit's `secrets.toml` are ignored, and the sample data i
 | 1.10 | `docs/plan.md` includes agent briefing details | Recommendation | **Keep** | It is tracked on purpose: it documents the decisions and the multi-agent build process |
 | 1.11 | Remote refs not checked | Could not verify | **Checked** | `origin` has only `main` and `momentum-dash` (project 1) |
 
-## Run 2: 23 Nov 2026
+## Run 2: 23 Nov 2026 (commit `97bd384`, after the run-1 fixes)
 
-_In progress: filled in after the run._
+Same setup: a new agent without context and the same prompt, plus two extra instructions: check that the README and
+this file match the repository, and view the screenshots.
+
+**Result:** still no secret in any revision (local and remote branches); `.env` is ignored and untracked, `.env.example`
+holds placeholders only; every file the README names exists; the setup steps and variable names match the code; both
+screenshots show only the app. Remaining points:
+
+| # | Finding | Type | Decision | What I did |
+|---|---|---|---|---|
+| 2-1 | README "Learning" is still a placeholder | Confirmed | **Open (planned)** | Same as 1.2: written by me before submitting |
+| 2-2 | Finding 1.4 (Streamlit secrets) still "to confirm" | Confirmed | **Open** | I check the app's secrets in Streamlit Cloud and update 1.4 |
+| 2-3 | Some commits in the history carry a personal email address and a student number | Possible | **Documented** | These are commits from project 1, documented in [`../momentum-dash/AUDIT.md`](../momentum-dash/AUDIT.md); all commits of this project use the GitHub noreply address |
+| 2-4 | The worktree branches of the two coding agents exist only locally, not on GitHub | Possible | **No change** | Their commits are in `main` through the two merge commits (`ffc0f4f`, `bde1d18`), so the parallel build stays visible in the history |
+| 2-5 | Python 3.12 is only stated in the README (no `runtime.txt` / `.python-version`) | Recommendation | **No change** | Streamlit Cloud takes the version from its settings, which the README documents |
+| 2-6 | README's "40 tests" not verified (no code run) | Could not verify | **Verified by me** | `python -m pytest -q`: 40 passed |
+| 2-7 | Screenshots show Streamlit's "Manage app" button (taken as the app owner) | Note | **No change** | Not sensitive |
+
+No code changes were needed after run 2.
 
 ## Verification
 
