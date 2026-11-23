@@ -40,4 +40,6 @@ def get_client(write: bool = False) -> Client:
             f"Missing {' and '.join(missing)}. Copy .env.example to {ENV_PATH} and fill in your "
             "Supabase project's values (Project Settings → API keys)."
         )
+    # The dashboard also shows the REST endpoint (".../rest/v1/"); the client wants only the base URL.
+    url = url.rstrip("/").removesuffix("/rest/v1")
     return create_client(url, key)

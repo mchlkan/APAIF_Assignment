@@ -51,3 +51,13 @@ def test_client_is_created_from_valid_settings(monkeypatch, tmp_path):
     monkeypatch.setenv("SUPABASE_URL", "https://abcdefghijklmnop.supabase.co")
     monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_test")
     assert db.get_client() is not None
+
+
+def test_rest_endpoint_url_is_accepted(monkeypatch, tmp_path):
+    # Users often copy the REST endpoint from the dashboard instead of the base project URL.
+    monkeypatch.setattr(db, "ENV_PATH", tmp_path / "no.env")
+    monkeypatch.setenv("SUPABASE_URL", "https://abcdefghijklmnop.supabase.co/rest/v1/")
+    monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_test")
+    client = db.get_client()
+    # Without the fix the client would call ".../rest/v1/rest/v1".
+    assert str(client.rest_url).rstrip("/") == "https://abcdefghijklmnop.supabase.co/rest/v1"
