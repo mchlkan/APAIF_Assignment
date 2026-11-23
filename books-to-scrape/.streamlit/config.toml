@@ -15,6 +15,9 @@ baseRadius = "8px"
 font = "'Source Sans 3':https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap"
 headingFont = "Lora:https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&display=swap"
 paddingTop = "2rem"
+# Smaller h4-h6 so card headings fit on one line (h1-h3 stay large).
+headingFontSizes = ["2.6rem", "2rem", "1.5rem", "1.15rem", "1rem", "0.9rem"]
+metricValueFontSize = "1.5rem"  # KPI tiles must fit side by side in a narrow window
 # Charts: green first, then burgundy, gold, slate blue ...
 chartCategoricalColors = ["#2F5D50", "#8C3B3B", "#C58B2B", "#4F6D8F", "#7A6A4F", "#A0527C"]
 # Sequential palette (exactly 10): light paper to dark green.
