@@ -53,26 +53,33 @@ Data lives in a Supabase (Postgres) project; the tables are created by [schema.s
   without touching the real database.
 
 ## User interaction
-Start the app from the repository root (it needs the Supabase keys in `books-to-scrape/.env`, or sample mode):
+Start the app from inside `books-to-scrape/`: Streamlit reads the theme from `.streamlit/config.toml` in the folder
+where it is started. It needs the Supabase keys in `.env`, or sample mode:
 
 ```bash
-conda run -n apaif streamlit run books-to-scrape/app.py
-BOOKS_SOURCE=sample conda run -n apaif streamlit run books-to-scrape/app.py   # no database needed
+cd books-to-scrape
+conda run -n apaif streamlit run app.py
+BOOKS_SOURCE=sample conda run -n apaif streamlit run app.py   # no database needed
 ```
 
-`BOOKS_SOURCE=sample` shows 60 synthetic books from `tests/fixtures/sample_books.csv`, so anyone can try the
-interface without a Supabase project. The app only ever uses the read-only publishable key.
+`BOOKS_SOURCE=sample` shows 60 synthetic books from `tests/fixtures/sample_books.csv` (no covers, so cards show a book
+icon), so anyone can try the interface without a Supabase project. The app only ever uses the read-only publishable key.
 
-The app has three tabs and a sidebar:
+The app looks like a small bookshop: a warm paper theme with a deep green accent and serif headings, set only in
+`.streamlit/config.toml` (no custom CSS). Under the title, five tiles show books, categories, median price, copies in
+stock and the share of 5-star books. Below are two tabs, plus a sidebar:
 
-- **Sidebar filters** (apply to Browse and Book detail): title search, categories, price range, minimum rating,
-  "in stock only" and a sort order.
-- **Browse**: a table of the matching books with cover thumbnail, category, price, rating, stock and a link to the
-  book's page on the source site. The caption shows how many books match.
-- **Book detail**: pick one of the filtered books to see its cover, rating, price, availability, description and link.
-- **Insights** (the extra feature): headline numbers (books, categories, average price, share in stock) and charts of
-  books per category (top 15), price distribution in £10 bands, and average price per star rating. These always
-  describe the whole catalogue, not the filtered selection.
+- **Sidebar filters** (apply to the Shelf tab): title search, categories, price range, minimum rating (star pills) and a
+  sort order. There is no "in stock only" filter: every scraped book is in stock, so it would change nothing.
+- **Shelf**: the matching books as a grid of cards (cover, title, rating, price, category), 24 per page with a page
+  control. "x of y books" shows how many match. **Details** opens a dialog with the bigger cover, full description,
+  prices with and without tax, copies available and a link to the book's page on the source site. A Grid/Table switch
+  falls back to a plain table.
+- **Insights** (the extra feature): short written findings computed from the data, each with a chart: the rating
+  distribution, price bands of £5, whether rating drives price, and the average price per category (categories with at
+  least 10 books; cheapest and priciest called out). Two shelves show the cheapest 5-star books and the books with the
+  fewest copies left. A caption explains that "Default" and "Add a comment" are the site's own placeholder categories.
+  These always describe the whole catalogue, not the filtered selection.
 - **Footer**: the data source and, for Supabase, the date and mode of the latest scrape run.
 
 Messages instead of crashes: missing or wrong keys (with the hint to use sample mode), an unreachable database, an
@@ -80,7 +87,7 @@ empty database ("run the scraper first") and a filter combination that matches n
 
 How it works: `queries.py` loads all books once (paged with `.range()`, because Supabase returns at most 1,000 rows per
 request; the category name is joined in) and holds the filter and aggregate functions as plain pandas code, which
-`tests/test_queries.py` checks offline. `app.py` only draws the interface and caches the loaded data for 10 minutes.
+`tests/test_queries.py` checks offline. `app.py` only draws the interface (small functions: header, filters, cards, dialog, insights) and caches the loaded data for 10 minutes.
 
 ## Setup
 _To do (docs task): fresh clone → conda env → `pip install -r requirements.txt` → Supabase project +
