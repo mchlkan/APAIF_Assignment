@@ -135,13 +135,21 @@ def test_best_value_is_cheapest_five_star(books):
     assert result["price"].iloc[0] == books[books["rating"] == 5]["price"].min()
 
 
-def test_low_stock_is_fewest_copies_but_available(books):
-    result = queries.low_stock(books, n=4)
+def test_most_stocked_has_the_most_copies(books):
+    result = queries.most_stocked(books, n=4)
     assert len(result) == 4
-    assert result["in_stock"].all() and (result["stock_count"] > 0).all()
-    assert result["stock_count"].is_monotonic_increasing
-    available = books[books["in_stock"] & (books["stock_count"] > 0)]
-    assert result["stock_count"].iloc[0] == available["stock_count"].min()
+    assert result["stock_count"].is_monotonic_decreasing
+    assert result["stock_count"].iloc[0] == books["stock_count"].max()
+
+
+def test_mark_category_prices(books):
+    prices = queries.category_prices(books, min_books=5)
+    marked = queries.mark_category_prices(prices)
+    assert marked["kind"].iloc[0] == "cheapest" and marked["kind"].iloc[-1] == "priciest"
+    assert (marked["kind"].iloc[1:-1] == "other").all()  # the sample has no placeholder categories
+    fake = pd.DataFrame({"category": ["A", "Default", "B", "C"], "books": 10, "avg_price": [1, 2, 3, 4]})
+    assert list(queries.mark_category_prices(fake)["kind"]) == ["cheapest", "placeholder", "other", "priciest"]
+    assert queries.mark_category_prices(prices.iloc[0:0]).empty
 
 
 def test_takeaways(books):

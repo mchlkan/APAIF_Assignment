@@ -189,10 +189,26 @@ def best_value(df: pd.DataFrame, n: int = 6) -> pd.DataFrame:
     return df[df["rating"] == 5].sort_values(["price", "title"]).head(n).reset_index(drop=True)
 
 
-def low_stock(df: pd.DataFrame, n: int = 6) -> pd.DataFrame:
-    """The `n` books with the fewest copies left (only books that are still in stock)."""
-    available = df[df["in_stock"] & (df["stock_count"] > 0)]
-    return available.sort_values(["stock_count", "title"]).head(n).reset_index(drop=True)
+def most_stocked(df: pd.DataFrame, n: int = 6) -> pd.DataFrame:
+    """The `n` books with the most copies on the shelf (ties: better rated first, then title)."""
+    ranked = df.sort_values(["stock_count", "rating", "title"], ascending=[False, False, True])
+    return ranked.head(n).reset_index(drop=True)
+
+
+def mark_category_prices(prices: pd.DataFrame) -> pd.DataFrame:
+    """Add a `kind` column to category_prices() output, used to colour the bars.
+
+    cheapest / priciest = first / last row; placeholder = the site's own non-genre categories;
+    everything else is 'other'. Cheapest and priciest win over placeholder so the chart and
+    the written takeaway always name the same categories.
+    """
+    marked = prices.copy()
+    marked["kind"] = "other"
+    marked.loc[marked["category"].isin(PLACEHOLDER_CATEGORIES), "kind"] = "placeholder"
+    if not marked.empty:
+        marked.loc[marked.index[0], "kind"] = "cheapest"
+        marked.loc[marked.index[-1], "kind"] = "priciest"
+    return marked
 
 
 def takeaways(df: pd.DataFrame, min_books: int = 10) -> dict:
