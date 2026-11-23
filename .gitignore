@@ -228,6 +228,8 @@ __marimo__/
 _work/
 CLAUDE.local.md
 .claude/
+# Agent skills installed locally (e.g. the Streamlit skill), not part of the projects
+.agents/
 .DS_Store
 .Rhistory
 .RData
