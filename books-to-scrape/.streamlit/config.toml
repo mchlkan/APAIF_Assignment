@@ -1,0 +1,21 @@
+# Bookshop look: deep green accent on warm paper, serif headings.
+# Streamlit reads this file from the folder where `streamlit run` is started,
+# so start the app from inside books-to-scrape/.
+# Only [theme] (no light/dark sections) locks one look, so the contrast stays predictable.
+
+[theme]
+base = "light"
+primaryColor = "#2F5D50"              # deep green; dark enough for white button text
+backgroundColor = "#FBF7EF"           # warm off-white, like book paper
+secondaryBackgroundColor = "#F1E8D6"  # a shade darker for the sidebar and widgets
+textColor = "#2B2118"                 # dark brown instead of pure black
+linkColor = "#2F5D50"
+borderColor = "#DCCDB0"
+baseRadius = "8px"
+font = "'Source Sans 3':https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap"
+headingFont = "Lora:https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&display=swap"
+paddingTop = "2rem"
+# Charts: green first, then burgundy, gold, slate blue ...
+chartCategoricalColors = ["#2F5D50", "#8C3B3B", "#C58B2B", "#4F6D8F", "#7A6A4F", "#A0527C"]
+# Sequential palette (exactly 10): light paper to dark green.
+chartSequentialColors = ["#F1E8D6", "#DDE3CE", "#C3D3BE", "#A6C0AE", "#86AB9A", "#679483", "#4D7D6D", "#3A6759", "#2F5D50", "#1F3F36"]
