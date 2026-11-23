@@ -5,7 +5,7 @@ Nova SBE, Applied Programming & AI Fundamentals. This repository contains three 
 | # | Project | What it is | Folder |
 |---|---|---|---|
 | 1 | Momentum Dash replica: **Verdant Tab** | Chrome new-tab extension: daily photo, clock, focus of the day, Pomodoro timer, focus streak, weather, quote, to-dos | [`momentum-dash/`](momentum-dash/) |
-| 2 | Books to Scrape | _In progress_ | _tbd_ |
+| 2 | Books to Scrape | Scrapes all 1,000 books from books.toscrape.com into Supabase (Postgres) and presents them in a Streamlit "bookshop" app with filters, book details and insights. [Live demo](https://ap-books-to-scrape.streamlit.app/) | [`books-to-scrape/`](books-to-scrape/) |
 | 3 | TVmaze API | _In progress_ | _tbd_ |
 
 Each project folder has its own `README.md` (purpose, data, persistence, usage, setup, learning, limitations) and an `AUDIT.md` documenting the pre-publication audit.
